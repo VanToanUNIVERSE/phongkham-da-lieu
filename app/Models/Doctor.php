@@ -10,7 +10,7 @@ class Doctor extends Model
     use HasFactory;
     protected $fillable = [
         "specialty",
-        "isFree",
+        "is_free",
         "user_id"
     ];
     public function user() {

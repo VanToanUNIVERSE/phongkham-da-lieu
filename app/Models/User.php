@@ -13,7 +13,7 @@ class User extends Authenticatable
         'username',
         'password',
         'gender',
-        'birthYear',
+        'birth_year',
         'phone',
         'status',
         'role_id',

@@ -13,7 +13,7 @@ class MedicalRecord extends Model
         'patient_id',
         'appointment_id',
         'diagnosis',
-        'examinationResult',
+        'examination_result',
     ];
     public function doctor()
     {
