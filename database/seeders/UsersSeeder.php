@@ -27,7 +27,8 @@ class UsersSeeder extends Seeder
             "gender" => 1,
             "birth_year" => 2004,
             "phone" => 0336112240,
-            "role_id" => $adminRole->id
+            "role_id" => $adminRole->id,
+            "full_name" => "Nguyễn Văn Toàn"
         ]);
         User::firstOrCreate([
             "username" => "doctor1"
@@ -38,7 +39,8 @@ class UsersSeeder extends Seeder
             "gender" => 1,
             "birth_year" => 2004,
             "phone" => '03453253653',
-            "role_id" => $doctorRole->id
+            "role_id" => $doctorRole->id,
+            "full_name" => "Nguyễn Văn A"
         ]);
         User::firstOrCreate([
             "username" => "medicalDispenser"
@@ -49,7 +51,8 @@ class UsersSeeder extends Seeder
             "gender" => 0,
             "birth_year" => 2004,
             "phone" => '0998332212',
-            "role_id" => $MedicalDispenserRole->id
+            "role_id" => $MedicalDispenserRole->id,
+            "full_name" => "Nguyễn Văn B"
         ]);
     }
 }

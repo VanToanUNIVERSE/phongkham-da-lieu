@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,9 +23,7 @@ Route::get("/login", [AuthController::class, 'showLogin'])->name("login");
 Route::post("/login", [AuthController::class, "login"])->name("postLogin");
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
 
-Route::get('/admin/dashboard', function(){
-    return "Admin Dashboard";
-})->middleware('auth');
+Route::get('/admin/dashboard', [AdminController::class, "index"])->middleware('auth');
 
 Route::get('/doctor/dashboard', function(){
     return "Doctor Dashboard";
