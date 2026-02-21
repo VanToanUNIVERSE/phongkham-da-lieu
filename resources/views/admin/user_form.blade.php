@@ -2,37 +2,37 @@
 <form method="POST" action="{{ route('users.store') }}">
     @csrf
 
-    <input type="text" name="username" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
+    <input id="f_username" type="text" name="username" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
 
     @error('username')
         <div style="color:red">{{ $message }}</div>
     @enderror
-    <input type="password" name="password" placeholder="Nhập mật khẩu">
+    <input id="f_password" type="password" name="password" placeholder="Nhập mật khẩu">
 
     @error('password')
         <div style="color:red">{{ $message }}</div>
     @enderror
-    <input type="text" name="full_name" placeholder="Nhập họ tên" value="{{ old('full_name') }}">
+    <input id="f_fullname" type="text" name="full_name" placeholder="Nhập họ tên" value="{{ old('full_name') }}">
 
     @error('full_name')
         <div style="color:red">{{ $message }}</div>
     @enderror
     <label>
-        <input type="radio" name="gender" value="1" {{ old('gender') == '1' ? 'checked' : '' }}>
+        <input id="g_male" type="radio" name="gender" value="1" {{ old('gender') == '1' ? 'checked' : '' }}>
         Nam
     </label>
 
     <label>
-        <input type="radio" name="gender" value="0" {{ old('gender') == '0' ? 'checked' : '' }}>
+        <input id="g_female" type="radio" name="gender" value="0" {{ old('gender') == '0' ? 'checked' : '' }}>
         Nữ
     </label>
 
     @error('gender')
         <div style="color:red">{{ $message }}</div>
     @enderror
-    <input type="number" name="birth_year" placeholder="Nhập năm sinh">
-    <input type="number" name="phone" placeholder="Nhập số điện thoại">
-    <select name="status">
+    <input id="f_birth" type="number" name="birth_year" placeholder="Nhập năm sinh">
+    <input id="f_phone" type="number" name="phone" placeholder="Nhập số điện thoại">
+    <select id="f_status" name="status">
         <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Còn làm</option>
         <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Đã nghỉ</option>
     </select>
@@ -40,7 +40,7 @@
     @error('status')
         <div style="color:red">{{ $message }}</div>
     @enderror
-    <select name="role_id">
+    <select id="f_role" name="role_id">
         <option value="1">Admin</option>
         <option value="2">Bác sĩ</option>
         <option value="3">Lễ tân</option>

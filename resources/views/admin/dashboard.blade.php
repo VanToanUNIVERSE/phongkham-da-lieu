@@ -26,7 +26,9 @@
                     <td>{{ $user->full_name }}</td>
                     <td>{{ $user->role->name }}</td>
                     <td>
-                        <a>Xem chi tiết</a>
+                        <button onclick="viewUser({{ $user->id }})">
+                            Xem
+                        </button>
                         <a>Sửa</a>
                         <a>Xóa</a>
                     </td>
@@ -42,8 +44,34 @@
         function closeModal() {
             document.getElementById("modal").style.display = "none";
         }
+
+        function viewUser(id) {
+
+            fetch('/users/' + id)
+                .then(res => res.json())
+                .then(user => {
+
+                    document.getElementById('f_username').value = user.username;
+                    document.getElementById('f_fullname').value = user.full_name;
+                    document.getElementById('f_birth').value = user.birth_year;
+                    document.getElementById('f_phone').value = user.phone;
+
+                    // gender
+                    if (user.gender === 'male') {
+                        document.getElementById('g_male').checked = true;
+                    } else {
+                        document.getElementById('g_female').checked = true;
+                    }
+
+                    // select
+                    document.getElementById('f_status').value = user.status;
+                    document.getElementById('f_role').value = user.role_id;
+
+                    openModal();
+                });
+        }
     </script>
-    @if ($errors->any()|| session('success'))
+    @if ($errors->any() || session('success'))
         <script>
             window.onload = function() {
                 openModal();
