@@ -29,7 +29,6 @@
                         <button onclick="viewUser({{ $user->id }})">
                             Xem
                         </button>
-                        <a>Sửa</a>
                         <a>Xóa</a>
                     </td>
                 </tr>
@@ -42,7 +41,23 @@
         }
 
         function closeModal() {
+            resetForm();
             document.getElementById("modal").style.display = "none";
+        }
+
+        function resetForm() {
+
+            // reset form
+            document.getElementById('userForm').reset();
+
+            // bỏ check gender
+            document.getElementById('g_male').checked = false;
+            document.getElementById('g_female').checked = false;
+
+            // reset select nếu cần
+            document.getElementById('f_status').value = "";
+            document.getElementById('f_role').value = "";
+
         }
 
         function viewUser(id) {
@@ -67,13 +82,28 @@
                     document.getElementById('f_status').value = user.status;
                     document.getElementById('f_role').value = user.role_id;
 
+                    // title
+                    document.getElementById('formTitle').innerText = "Sửa người dùng";
+
+                    // button
+                    document.getElementById('submitBtn').innerText = "Cập nhật";
+
+                    // action
+                    form = document.getElementById("userForm");
+                    form.action = "/users/" + id;
+
+                    // method PUT
+                    document.getElementById('formMethod').value = "PUT";
+
                     openModal();
+
                 });
         }
     </script>
     @if ($errors->any() || session('success'))
         <script>
             window.onload = function() {
+
                 openModal();
             }
         </script>

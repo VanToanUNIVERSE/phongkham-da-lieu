@@ -74,9 +74,34 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'username'   => 'required|min:3|unique:users,username,' . $user->id,
+            'full_name'  => 'required',
+            'gender'     => 'required',
+            'status'     => 'required',
+            'role_id'    => 'required|exists:roles,id'
+        ]);
+
+        $data = [
+            'username'   => $request->username,
+            'full_name'  => $request->full_name,
+            'gender'     => $request->gender,
+            'birth_year' => $request->birth_year,
+            'phone'      => $request->phone,
+            'status'     => $request->status,
+            'role_id'    => $request->role_id,
+        ];
+
+        // nếu nhập password mới thì đổi
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        $user->update($data);
+
+        return redirect()->back()->with('success', 'Cập nhật người dùng thành công');
     }
 
     /**

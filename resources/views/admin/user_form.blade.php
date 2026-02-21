@@ -1,7 +1,7 @@
-<h2>Thêm người dùng mới</h2>
-<form method="POST" action="{{ route('users.store') }}">
+<h2 id="formTitle">Thêm người dùng mới</h2>
+<form id="userForm" method="POST" action="{{ route('users.store') }}">
     @csrf
-
+    <input type="hidden" id="formMethod" name="_method" value="POST">
     <input id="f_username" type="text" name="username" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
 
     @error('username')
@@ -46,7 +46,7 @@
         <option value="3">Lễ tân</option>
         <option value="4">Nhân viên phát thuốc</option>
     </select>
-    <button type="submit">Thêm</button>
+    <button id="submitBtn" type="submit">Thêm</button>
     @if (session('success')) {
         <div style="color:green; border:1px solid green; padding:10px; margin-bottom:10px;">
             {{ session('success') }}
