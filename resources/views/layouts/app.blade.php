@@ -52,7 +52,10 @@
         <img src="{{ asset('images/logophongkham.png') }}" width="100px">
         {{-- Sidebar --}}
         @include('partials.sidebar')
-        <a id="logout">Đăng xuất</a>
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit">Đăng xuất</button>
+        </form>
     </header>
 
 
