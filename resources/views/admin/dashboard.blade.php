@@ -29,7 +29,7 @@
                         <button onclick="viewUser({{ $user->id }})">
                             Xem
                         </button>
-                        <a>Xóa</a>
+                        <button onclick="deleteUser({{ $user->id }})">Xóa</button>
                     </td>
                 </tr>
             @endforeach
@@ -97,6 +97,26 @@
 
                     openModal();
 
+                });
+        }
+
+        function deleteUser(id) {
+
+            if (!confirm("Xoá user này?")) return;
+
+            fetch('/users/' + id, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                })
+                .then(res => res.json())
+                .then(() => {
+                    alert("Đã xoá");
+                    location.reload();
+                })
+                .catch(() => {
+                    alert("Lỗi xoá");
                 });
         }
     </script>
