@@ -9,13 +9,13 @@ const id = document.getElementById('id');
 const message = document.getElementById('message');
 const errors = document.getElementById('errors');
 const patientTable = document.getElementById('patientTable');
-function loadData(){
-     console.log("loadData running...");
+function loadData() {
+    console.log("loadData running...");
     fetch('/patients/loadData')
-    .then(res=>res.json())
-    .then(data=>{
+        .then(res => res.json())
+        .then(data => {
 
-        let html = `
+            let html = `
         <tr>
             <th>Tên</th>
             <th>Điện thoại</th>
@@ -24,9 +24,9 @@ function loadData(){
             <th></th>
         </tr>`;
 
-        data.patients.forEach(p=>{
+            data.patients.forEach(p => {
 
-            html += `
+                html += `
             <tr id="row-${p.id}">
                 <td>${p.full_name}</td>
                 <td>${p.phone ?? ''}</td>
@@ -37,13 +37,13 @@ function loadData(){
                     <button onclick="del(${p.id})">Xóa</button>
                 </td>
             </tr>`;
+            });
+
+            patientTable.innerHTML = html;
+
+        }).catch(e => {
+            alert(e);
         });
-
-        patientTable.innerHTML = html;
-
-    }).catch(e => {
-        alert(e);
-    });
 }
 function openModal() {
     modal.style.display = 'block';
@@ -68,16 +68,18 @@ function openCreate() {
 }
 
 function save() {
+    const formData = new FormData();
+    const method = 'POST';
     if (id.value) {
         url = `/patients/${id.value}`;
-        method = 'PUT';
+        formData.append('_method', 'PUT');
     }
     else {
         url = `/patients`;
-        method = 'POST';
+        
     }
 
-    const formData = new FormData();
+    
     formData.append('full_name', fullName.value);
     formData.append('phone', phone.value);
     formData.append('birth_year', birthYear.value);
@@ -110,5 +112,24 @@ function save() {
         alert("Lỗi: " + e);
     })
 }
+
+function edit(nid) {
+    openModal();
+    fetch('/patients/' + nid)
+        .then(res => res.json())
+        .then(data => {
+            id.value = data.patient.id;
+            fullName.value = data.patient.full_name;
+            phone.value = data.patient.phone;
+            birthYear.value = data.patient.birth_year;
+            gender.value = data.patient.gender;
+            address.value = data.patient.address;
+        })
+        .catch(e => {
+            alert("Lỗi" + e)
+        });
+}
+
+
 
 loadData();
