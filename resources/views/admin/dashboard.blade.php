@@ -109,7 +109,7 @@
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     }
-                })
+                })  
                 .then(res => res.json())
                 .then(() => {
                     alert("Đã xoá");
