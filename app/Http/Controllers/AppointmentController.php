@@ -48,8 +48,7 @@ class AppointmentController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Thêm lịch khám thành công',
-                'appointment' => $appointment
+                'message' => 'Thêm lịch khám thành công'
             ]);
         }
         catch(ValidationException $e){
@@ -66,9 +65,12 @@ class AppointmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Appointment $appointment)
     {
-        //
+        
+        return response()->json([
+            'appointment' => $appointment
+        ]);
     }
 
     /**
@@ -82,16 +84,51 @@ class AppointmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Appointment $appointment)
     {
-        //
+        try {
+                $data = $request->validate([
+                'doctor_id' => 'required',
+                'patient_id' => 'required',
+                'date' => 'required',
+                'time' => 'required',
+                'status' => 'required'
+            ]);
+
+            $appointment->update($data);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Sửa khám thành công',
+                'appointment' => $appointment
+            ]);
+        }
+        catch(ValidationException $e){
+
+        return response()->json([
+            'status'=>'fail',
+            'errors' => $e->errors(),
+            'message' => 'Lỗi nhập liệu'
+            ], 422);
+        }   
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Appointment $appointment)
     {
-        //
+        $appointment->delete();
+
+        return response()->json([
+            'status' => 'success'
+        ]);
+    }
+
+    function loadData() {
+        $appointments = Appointment::with(['doctor.user', 'patient'])->get();
+        return response()->json([
+            'appointments' => $appointments
+        ]);
     }
 }

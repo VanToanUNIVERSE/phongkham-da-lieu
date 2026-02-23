@@ -8,6 +8,7 @@ const time = document.getElementById('time');
 const aStatus = document.getElementById('status');
 const message = document.getElementById('message');
 const errors = document.getElementById('errors');
+const table = document.getElementById('appointmentTable');
 function openModal() {
     modal.style.display = 'block';
 }
@@ -19,14 +20,53 @@ function resetForm() {
     id.value = "";
     doctorId.value = "";
     patientId.value = "";
+    date.value='';
+    time.value='';
     aStatus.value = "";
     /* message.innerHTML = ""; */
     errors.innerHTML = "";
 }
 
+function loadData() {
+    fetch('/appointments/loadData')
+    .then(res => res.json())
+    .then(data => {
+        table.innerHTML = `
+        <tr>
+            <th>Mã lịch khám</th>
+            <th>Bác sỉ</th>
+            <th>Bệnh nhân</th>
+            <th>Ngày</th>
+            <th>Giờ</th>
+            <th>Trạng thái</th>
+            <th>Thao tác</th>
+        </tr>
+        `;
+        
+        data.appointments.forEach(a => {
+            table.innerHTML += `<tr id="row-${a.id}">
+                <td>${a.id}</td>
+                <td>${a.doctor.user.full_name ?? ''}</td>
+                <td>${a.patient.full_name ?? ''}</td>
+                <td>${a.date}</td>
+                <td>${a.time}</td>
+                <td>${a.status}</td>
+                <td>
+                    <button onclick="edit(${a.id})">Sửa</button>
+                    <button onclick="del(${a.id})">Xóa</button>
+                </td>
+            </tr>`
+        });
+    })
+    .catch(e => {
+        alert("Lỗi: " + e);
+    })
+}
+
 function openCreate() {
     openModal();
     resetForm();
+    message.innerHTML = "";
 }
 
 function save() {
@@ -56,6 +96,7 @@ function save() {
             message.innerHTML = data.message;
             if (data.status == 'success') {
                 resetForm();
+                loadData();
             }
             else {
                 let html = '';
@@ -71,3 +112,46 @@ function save() {
         });
 }
 
+function edit(nid) {
+    openModal();
+    document.getElementById('title').innerText = "Sửa lịch khám";
+    errors.innerHTML = '';
+    message.innerHTML = '';
+    fetch('/appointments/' + nid)
+    .then(res => res.json())
+    .then(data => {
+        const appointment = data.appointment;
+        id.value = appointment.id;
+        doctorId.value = appointment.doctor_id;
+        patientId.value = appointment.patient_id;
+        date.value = appointment.date;
+        time.value = appointment.time;
+        aStatus.value = appointment.status;
+    })
+    .catch(e => {
+        alert("Lỗi: " + e);
+    })
+}
+
+function del(nid) {
+    if(!confirm("Bạn có chắc muốn xóa lịch bệnh này?")) return;
+    const formData = new FormData();
+    formData.append('_method', 'DELETE')
+    fetch('/appointments/' + nid, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Accept': 'application/json'
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.status == 'success') {
+            loadData();
+        }
+    })
+    .catch(e => {
+        alert("Lỗi: " + e);
+    })
+}

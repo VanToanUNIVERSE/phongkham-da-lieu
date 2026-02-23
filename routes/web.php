@@ -31,6 +31,7 @@ Route::get('/admin/dashboard', [AdminController::class, "index"])->middleware('a
 Route::resource('users', UserController::class);
 Route::get('/patients/loadData', [PatientController::class, 'loadData']);
 Route::resource('patients', PatientController::class);
+Route::get('/appointments/loadData', [AppointmentController::class, 'loadData']);
 Route::resource('appointments', AppointmentController::class);
 
 
