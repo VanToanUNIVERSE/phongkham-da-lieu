@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\UserController;
@@ -30,6 +31,7 @@ Route::get('/admin/dashboard', [AdminController::class, "index"])->middleware('a
 Route::resource('users', UserController::class);
 Route::get('/patients/loadData', [PatientController::class, 'loadData']);
 Route::resource('patients', PatientController::class);
+Route::resource('appointments', AppointmentController::class);
 
 
 Route::get('/doctor/dashboard', function(){
