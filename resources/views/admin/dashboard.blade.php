@@ -81,6 +81,14 @@
                     // select
                     document.getElementById('f_status').value = user.status;
                     document.getElementById('f_role').value = user.role_id;
+                    toggleDoctorForm();
+                    if (user.doctor) {
+                        document.getElementById('specialty').value = user.doctor.specialty ?? '';
+                        document.getElementById('is_free').value = user.doctor.is_free ?? '';
+                    } else {
+                        document.getElementById('specialty').value = '';
+                        document.getElementById('is_free').value = '';
+                    }
 
                     // title
                     document.getElementById('formTitle').innerText = "Sửa người dùng";
@@ -109,7 +117,7 @@
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     }
-                })  
+                })
                 .then(res => res.json())
                 .then(() => {
                     alert("Đã xoá");
@@ -118,6 +126,17 @@
                 .catch(() => {
                     alert("Lỗi xoá");
                 });
+        }
+
+        function toggleDoctorForm() {
+            const doctorForm = document.getElementById('doctor_form');
+            const role = document.getElementById('f_role');
+
+            if (role.value == 2) {
+                doctorForm.style.display = 'block';
+            } else {
+                doctorForm.style.display = 'none';
+            }
         }
     </script>
     @if ($errors->any() || session('success'))

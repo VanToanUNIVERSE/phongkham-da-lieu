@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -40,7 +41,7 @@ class UserController extends Controller
             'role_id' => 'required|exists:roles,id',
             ]);
 
-        User::create([
+        $user = User::create([
             'username'   => $request->username,
             'password'   => Hash::make($request->password),
             'full_name'  => $request->full_name,
@@ -51,6 +52,13 @@ class UserController extends Controller
             'role_id'    => $request->role_id,
             ]);
 
+        if ($request->role_id == 2) {
+            $user->doctor()->create([
+                'specialty' => $request->specialty,
+                'is_free'   => $request->is_free
+            ]);
+        }
+
         return redirect()->back()->with('success', 'Thêm user thành công');
     }
 
@@ -59,8 +67,9 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = \App\Models\User::with('role')->findOrFail($id);
-        return response()->json($user);
+        return response()->json(
+            User::with('role','doctor')->findOrFail($id)
+        );
     }
 
     /**
@@ -100,6 +109,33 @@ class UserController extends Controller
         }
 
         $user->update($data);
+
+        if ($request->role_id == 2) {
+
+        // nếu chưa có doctor → tạo
+        if (!$user->doctor) {
+            $user->doctor()->create([
+                'specialty' => $request->specialty,
+                'is_free'   => $request->is_free
+            ]);
+        }
+        // nếu đã có → update
+        else {
+            $user->doctor->update([
+                'specialty' => $request->specialty,
+                'is_free'   => $request->is_free
+            ]);
+        }
+    }
+    // nếu KHÔNG còn là bác sĩ → xoá doctor
+    else {
+        if ($user->doctor) {
+            $user->doctor->delete();
+        }
+    }
+
+
+        
 
         return redirect()->back()->with('success', 'Cập nhật người dùng thành công');
     }

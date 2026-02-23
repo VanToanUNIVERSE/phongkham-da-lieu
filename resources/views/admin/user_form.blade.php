@@ -2,7 +2,8 @@
 <form id="userForm" method="POST" action="{{ route('users.store') }}">
     @csrf
     <input type="hidden" id="formMethod" name="_method" value="POST">
-    <input id="f_username" type="text" name="username" placeholder="Nhập tên đăng nhập" value="{{ old('username') }}">
+    <input id="f_username" type="text" name="username" placeholder="Nhập tên đăng nhập"
+        value="{{ old('username') }}">
 
     @error('username')
         <div style="color:red">{{ $message }}</div>
@@ -40,14 +41,22 @@
     @error('status')
         <div style="color:red">{{ $message }}</div>
     @enderror
-    <select id="f_role" name="role_id">
+    <select id="f_role" name="role_id" onchange="toggleDoctorForm()">
         <option value="1">Admin</option>
         <option value="2">Bác sĩ</option>
         <option value="3">Lễ tân</option>
         <option value="4">Nhân viên phát thuốc</option>
     </select>
+    <div id="doctor_form">
+        <input type="text" id="specialty" name="specialty" placeholder="Chuyên môn">
+        <select id="is_free" name="is_free">
+            <option value="0">Đang trống</option>
+            <option value="1">Đang khám</option>
+        </select>
+    </div>
     <button id="submitBtn" type="submit">Thêm</button>
-    @if (session('success')) {
+    @if (session('success'))
+        {
         <div style="color:green; border:1px solid green; padding:10px; margin-bottom:10px;">
             {{ session('success') }}
         </div>
