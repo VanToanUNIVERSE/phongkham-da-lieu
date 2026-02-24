@@ -70,9 +70,11 @@ function openCreate() {
 function save() {
     const formData = new FormData();
     const method = 'POST';
+    let isReset = true;
     if (id.value) {
         url = `/patients/${id.value}`;
         formData.append('_method', 'PUT');
+        isReset = false;
     }
     else {
         url = `/patients`;
@@ -96,7 +98,7 @@ function save() {
     }).then(res => res.json()).then(data => {
         message.innerHTML = data.message;
         if (data.status == 'success') {
-            resetForm();
+            isReset ? resetForm() : '';
             loadData();
         }
         else {

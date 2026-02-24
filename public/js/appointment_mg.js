@@ -73,9 +73,11 @@ function save() {
     let url = '/appointments';
     const method = 'POST';
     const formData = new FormData();
+    let isReset = true;
     if (id.value) {
         url = '/appointments/' + id.value;
         formData.append('_method', 'PUT');
+        isReset = false;
     }
     formData.append('doctor_id', doctorId.value);
     formData.append('patient_id', patientId.value);
@@ -95,7 +97,7 @@ function save() {
         .then(data => {
             message.innerHTML = data.message;
             if (data.status == 'success') {
-                resetForm();
+                isReset ? resetForm() : '';
                 loadData();
             }
             else {

@@ -34,7 +34,7 @@ Route::get('/patients/loadData', [PatientController::class, 'loadData']);
 Route::resource('patients', PatientController::class);
 Route::get('/appointments/loadData', [AppointmentController::class, 'loadData']);
 Route::resource('appointments', AppointmentController::class);
-
+Route::get('/medical_records/loadData', [MedicalRecordController::class, 'loadData']);
 Route::resource('medical_records', MedicalRecordController::class);
 
 

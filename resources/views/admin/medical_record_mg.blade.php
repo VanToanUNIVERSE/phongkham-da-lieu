@@ -5,7 +5,7 @@
 
     <button onclick="openCreate()" class="btn btn-primary">+ Thêm lịch khám</button>
 
-    <table border="1" width="100%" id="appointmentTable">
+    <table border="1" width="100%" id="table">
         <tr>
             <th>Mã bệnh án</th>
             <th>Mã lịch khám</th>
@@ -60,7 +60,7 @@
         </select><br><br>
 
         <input type="text" id="diagnosis" placeholder="Nhập chẩn đoán"><br><br>
-        <input type="text" id="examnination_result" placeholder="Nhập kết quả khám"><br><br>
+        <input type="text" id="examination_result" placeholder="Nhập kết quả khám"><br><br>
 
 
         <button onclick="save()">Lưu</button>
