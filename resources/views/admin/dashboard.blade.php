@@ -38,6 +38,7 @@
     <script>
         function openModal() {
             document.getElementById("modal").style.display = "block";
+            toggleDoctorForm();
         }
 
         function closeModal() {
@@ -49,6 +50,11 @@
 
             // reset form
             document.getElementById('userForm').reset();
+            form = document.getElementById("userForm");
+            form.action = "/users/" ;
+
+            // title
+            document.getElementById('formTitle').innerText = "Thêm người dùng";
 
             // bỏ check gender
             document.getElementById('g_male').checked = false;

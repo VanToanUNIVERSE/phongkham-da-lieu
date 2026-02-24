@@ -47,7 +47,7 @@
         <option value="3">Lễ tân</option>
         <option value="4">Nhân viên phát thuốc</option>
     </select>
-    <div id="doctor_form">
+    <div id="doctor_form" style="dipslay:none">
         <input type="text" id="specialty" name="specialty" placeholder="Chuyên môn">
         <select id="is_free" name="is_free">
             <option value="0">Đang trống</option>
