@@ -20,4 +20,8 @@ class Prescription extends Model
     public function medical_record() {
         return $this->belongsTo(MedicalRecord::class);
     }
+    public function items()
+    {
+        return $this->hasMany(PrescriptionItem::class);
+    }
 }
