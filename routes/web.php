@@ -4,7 +4,9 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MedicalRecordController;
+use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +38,10 @@ Route::get('/appointments/loadData', [AppointmentController::class, 'loadData'])
 Route::resource('appointments', AppointmentController::class);
 Route::get('/medical_records/loadData', [MedicalRecordController::class, 'loadData']);
 Route::resource('medical_records', MedicalRecordController::class);
+Route::get('/medicines/loadData', [MedicineController::class, 'loadData']);
+Route::resource('medicines', MedicineController::class);
+Route::get('/prescriptions/loadData', [PrescriptionController::class, 'loadData']);
+Route::resource('prescriptions', PrescriptionController::class);
 
 
 Route::get('/doctor/dashboard', function(){
