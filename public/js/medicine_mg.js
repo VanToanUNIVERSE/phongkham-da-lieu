@@ -184,5 +184,4 @@ function del(nid) {
         })
 }
 
-
 loadData();

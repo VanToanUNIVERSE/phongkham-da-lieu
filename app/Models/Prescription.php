@@ -13,15 +13,15 @@ class Prescription extends Model
         "dispensed_by", 
         "content",
         "dispense_status"
-    ];
-    public function Medicaldispenser() {
-        return $this->belongsTo(User::class);
-    }
+    ];  
     public function medical_record() {
         return $this->belongsTo(MedicalRecord::class);
     }
     public function items()
     {
         return $this->hasMany(PrescriptionItem::class);
+    }
+    public function user() {
+        return $this->belongsTo(User::class, 'dispensed_by');
     }
 }

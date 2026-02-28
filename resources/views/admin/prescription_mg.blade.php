@@ -22,7 +22,7 @@
                 <td>{{ $p->content }}</td>
                 <td>{{ $p->dispense_status }}</td>
                 <td>
-                    <button onclick="edit({{ $p->id }})">Sửa</button>
+                    <button onclick="edit({{ $p->id }}, {{ $medicines }})">Sửa</button>
                     <button onclick="del({{ $p->id }})">Xóa</button>
                 </td>
             </tr>
@@ -32,41 +32,64 @@
 
     {{-- MODAL --}}
     <div id="modal"
-        style="display:none; position:fixed; top:20%; left:35%; background:white; padding:20px; border:1px solid #ccc;">
-        <h3 id="title">Thêm đơn thuốc</h3>
-        <input type="hidden" id="id">
+    style="display:none; position:fixed; top:10%; left:25%; width:50%; background:white; padding:20px; border:1px solid #ccc;">
 
-        <select id="appointment_id">
-            <option value="" selected>Chọn lịch khám</option>
-            @foreach ($appointments as $a)
-                <option value="{{ $a->id }}">{{ $a->id }}</option>
-            @endforeach
-        </select><br><br>
+    <h3 id="title">Thêm đơn thuốc</h3>
 
-        <select id="doctor_id">
-            <option value="" selected>Chọn bác sỉ</option>
-            @foreach ($doctors as $d)
-                <option value="{{ $d->id }}">{{ $d->user->full_name }}</option>
-            @endforeach
-        </select><br><br>
+    <input type="hidden" id="id">
 
-        <select id="patient_id">
-            <option value="" selected>Chọn bệnh nhân</option>
-            @foreach ($patients as $p)
-                <option value="{{ $p->id }}">{{ $p->full_name }}</option>
-            @endforeach
-        </select><br><br>
+    <!-- HEADER -->
+    <select id="medical_record_id">
+        <option value="">Chọn mã bệnh án</option>
+        @foreach ($medical_records as $a)
+            <option value="{{ $a->id }}">{{ $a->id }}</option>
+        @endforeach
+    </select><br><br>
 
-        <input type="text" id="diagnosis" placeholder="Nhập chẩn đoán"><br><br>
-        <input type="text" id="examination_result" placeholder="Nhập kết quả khám"><br><br>
+    <select id="user_id">
+        <option value="">Chọn nhân viên phát thuốc</option>
+        @foreach ($users as $s)
+            <option value="{{ $s->id }}">{{ $s->full_name }}</option>
+        @endforeach
+    </select><br><br>
+
+    <input type="text" id="content" placeholder="Nhập nội dung">
+
+    <select id="dispense_status">
+        <option value="Chưa phát">Chưa phát</option>
+        <option value="Đã phát">Đã phát</option>
+    </select>
+
+    <hr>
+
+    <!-- DETAIL THUỐC -->
+    <h4>Chi tiết thuốc</h4>
+
+    <table border="1" width="100%">
+        <thead>
+            <tr>
+                <th>Thuốc</th>
+                <th>Số lượng</th>
+                <th>Liều dùng</th>
+                <th>Cách dùng</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="medicine-items">
+        </tbody>
+    </table>
+
+    <br>
+    <button onclick="addMedicineRow({{ $medicines }})">+ Thêm thuốc</button>
+
+    <hr>
 
 
-        <button onclick="save()">Lưu</button>
-        <button onclick="closeModal()">Đóng</button>
-        <h3 id="message"></h3>
-        <div id="errors">
+    <h3 id="message"></h3>
+    <div id="errors"></div>
+    <button onclick="save()">Lưu</button>
+    <button onclick="closeModal()">Đóng</button>
 
-        </div>
-    </div>
-    <script src="{{ asset('js/medical_record_mg.js') }}"></script>
+</div>
+    <script src="{{ asset('js/prescription_mg.js') }}"></script>
 @endsection
