@@ -145,9 +145,23 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        $user->delete();
-        return response()->json([
-            'message' => 'Đã xoá'
-        ]);
+        try {
+            // Nếu là bác sĩ thì xóa record trong bảng doctors trước
+            if ($user->doctor) {
+                $user->doctor->delete();
+            }
+            
+            $user->delete();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Xoá người dùng thành công'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Không thể xóa người dùng này vì có dữ liệu ràng buộc (VD: Lịch khám, Bệnh án...)'
+            ], 500);
+        }
     }
 }
