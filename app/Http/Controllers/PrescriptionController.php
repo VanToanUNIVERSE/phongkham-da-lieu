@@ -45,6 +45,7 @@ class PrescriptionController extends Controller
             'medical_record_id' => 'required|exists:medical_records,id',
             'dispensed_by' => 'required|exists:users,id',
             'dispense_status' => 'required',
+            'content' => 'required',
             'items' => 'required|array|min:1',
             'items.*.medicine_id' => 'required|exists:medicines,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -112,7 +113,7 @@ class PrescriptionController extends Controller
 
         return response()->json([
             'status' => 'error',
-            'message' => 'Có lỗi xảy ra'
+            'message' => $e->getMessage()
         ], 500);
     }
 }

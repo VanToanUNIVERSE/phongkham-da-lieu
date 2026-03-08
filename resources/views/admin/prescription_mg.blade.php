@@ -22,7 +22,7 @@
                 <td>{{ $p->content }}</td>
                 <td>{{ $p->dispense_status }}</td>
                 <td>
-                    <button onclick="edit({{ $p->id }}, {{ $medicines }})">Sửa</button>
+                    <button onclick="edit({{ $p->id }})">Sửa</button>
                     <button onclick="del({{ $p->id }})">Xóa</button>
                 </td>
             </tr>
@@ -91,5 +91,8 @@
     <button onclick="closeModal()">Đóng</button>
 
 </div>
+    <script>
+    window.medicines = @json($medicines);
+</script>
     <script src="{{ asset('js/prescription_mg.js') }}"></script>
 @endsection

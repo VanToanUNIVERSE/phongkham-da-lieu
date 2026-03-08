@@ -1,6 +1,6 @@
 const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
-
+const medicines = window.medicines;
 
 const id = document.getElementById('id');
 const medicalRecordId = document.getElementById('medical_record_id');
@@ -27,6 +27,8 @@ function resetForm() {
     dispenseStatus.value = '';
     /* message.innerHTML = ""; */
     errors.innerHTML = "";
+    document.getElementById('title').innerHTML = "Thêm đơn thuốc";
+    document.getElementById("medicine-items").innerHTML = '';
 }
 
 function openCreate() {
@@ -185,7 +187,7 @@ function save() {
 }
 
 
-function edit(id, medicines) {
+function edit(id) {
 
     openModal();
 
@@ -196,7 +198,7 @@ function edit(id, medicines) {
     fetch('/prescriptions/' + id)
         .then(res => res.json())
         .then(res => {
-
+            console.log(res); 
             const p = res.data;
 
             // Header
@@ -211,17 +213,23 @@ function edit(id, medicines) {
             tbody.innerHTML = '';
 
             // Render items
-            p.items.forEach(item => {
-                addMedicineRowEdit(item, medicines);
+            if(!p.items) {
+                console.log("Don thuoc rong");
+            }
+            else {
+                p.items.forEach(item => {
+                addMedicineRowEdit(item);
             });
+            }
+            
 
         })
         .catch(e => {
-            alert("Lỗi: " + e);
+            console.log("Lỗi: " + e);
         });
 }
 
-function addMedicineRowEdit(item, medicines) {
+function addMedicineRowEdit(item) {
 
 
     let options = '<option value="">Chọn thuốc</option>';
@@ -280,5 +288,3 @@ function del(nid) {
             alert("Lỗi: " + e);
         })
 }
-
-loadData();

@@ -11,6 +11,7 @@
             Chào mừng {{ Auth::user()->role->name }}
         @endif
     </title>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         header {
             display: flex;
