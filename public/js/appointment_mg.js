@@ -203,30 +203,12 @@ function edit(nid) {
 }
 
 function del(nid) {
-    if(!confirm("Bạn có chắc muốn xóa lịch bệnh này?")) return;
-    const formData = new FormData();
-    formData.append('_method', 'DELETE')
-    fetch('/appointments/' + nid, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status == 'success') {
-            loadData();
-        }
-    })
-    .catch(e => {
-        alert("Lỗi: " + e);
-    })
+    showDeleteConfirm(nid, 'mục Lịch khám này', '/appointments');
 }
 
 // Gọi hàm loadData khi trang được tải xong để cập nhật dữ liệu bảng
 loadData();
+
 
 
 

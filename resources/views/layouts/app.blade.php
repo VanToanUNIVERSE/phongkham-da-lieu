@@ -49,6 +49,9 @@
             </div>
         </main>
         
+        {{-- Shared Modals --}}
+        @include('partials.confirm_delete_modal')
+        
     </div>
 </body>
 </html>

@@ -194,30 +194,9 @@ function edit(nid) {
 }
 
 function del(nid) {
-    if (!confirm("Bạn có chắc muốn xoá bệnh nhân này?")) return;
-    const formData = new FormData();
-
-    formData.append('_method', 'DELETE');
-
-    fetch('/patients/' + nid, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
-        },
-        body: formData
-    }).then(res => res.json()).then(data => {
-        message.innerHTML = data.message;
-        if (data.status === 'success') {
-            loadData();
-        }
-        else {
-            alert("Xoá thất bại");
-        }
-    }).catch(e => {
-        alert("Lỗi: " + e);
-    })
+    showDeleteConfirm(nid, 'mục Bệnh nhân này', '/patients');
 }
 
 loadData();
+
 

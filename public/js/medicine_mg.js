@@ -207,28 +207,10 @@ function edit(nid) {
 
 
 function del(nid) {
-    if (!confirm("Bạn có chắc muốn xóa thuốc?")) return;
-    const formData = new FormData();
-    formData.append('_method', 'DELETE')
-    fetch('/medicines/' + nid, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
-        .then(res => res.json())
-        .then(data => {
-            if (data.status == 'success') {
-                loadData();
-            }
-        })
-        .catch(e => {
-            alert("Lỗi: " + e);
-        })
+    showDeleteConfirm(nid, 'mục Thuốc này', '/medicines');
 }
 
 loadData();
+
 
 

@@ -211,28 +211,7 @@
         }
 
         function deleteUser(id) {
-
-            if (!confirm("Bạn có chắc chắn muốn xoá người dùng này?")) return;
-
-            fetch('/users/' + id, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        location.reload();
-                    } else {
-                        alert("Lỗi: " + (data.message || 'Không thể xóa'));
-                    }
-                })
-                .catch(e => {
-                    alert("Lỗi kết nối khi xoá");
-                    console.error(e);
-                });
+            showDeleteConfirm(id, 'người dùng này', '/users');
         }
 
         function toggleDoctorForm() {

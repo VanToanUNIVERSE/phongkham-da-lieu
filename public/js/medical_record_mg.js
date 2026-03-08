@@ -200,29 +200,11 @@ function edit(nid) {
 
 
 function del(nid) {
-    if(!confirm("Bạn có chắc muốn xóa bệnh án này?")) return;
-    const formData = new FormData();
-    formData.append('_method', 'DELETE')
-    fetch('/medical_records/' + nid, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': token,
-            'Accept': 'application/json'
-        },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(data => {
-        if(data.status == 'success') {
-            loadData();
-        }
-    })
-    .catch(e => {
-        alert("Lỗi: " + e);
-    })
+    showDeleteConfirm(nid, 'mục Bệnh án này', '/medical_records');
 }
 
 
 loadData();
+
 
 
