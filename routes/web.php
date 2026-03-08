@@ -7,6 +7,7 @@ use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\PrescriptionController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
@@ -42,7 +43,7 @@ Route::get('/medicines/loadData', [MedicineController::class, 'loadData']);
 Route::resource('medicines', MedicineController::class);
 Route::get('/prescriptions/loadData', [PrescriptionController::class, 'loadData']);
 Route::resource('prescriptions', PrescriptionController::class);
-
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
 Route::get('/doctor/dashboard', function(){
     return "Doctor Dashboard";
