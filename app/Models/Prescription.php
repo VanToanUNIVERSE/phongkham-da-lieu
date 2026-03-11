@@ -24,4 +24,11 @@ class Prescription extends Model
     public function user() {
         return $this->belongsTo(User::class, 'dispensed_by');
     }
+
+    public function getTotalCostAttribute()
+    {
+        return $this->items->sum(function($item) {
+            return $item->quantity * $item->medicine->price;
+        });
+    }
 }

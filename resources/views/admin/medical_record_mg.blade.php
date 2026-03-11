@@ -13,7 +13,7 @@
                 
                 <!-- Modal Header -->
                 <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
-                    <h3 id="title" class="text-xl font-bold text-gray-800">Thêm hồ sơ Bệnh án</h3>
+                    <h3 id="title" class="text-xl font-bold text-gray-800">Thêm Hồ sơ khám</h3>
                     <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 hover:bg-red-50 p-1 rounded-md transition-colors focus:outline-none">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
@@ -96,12 +96,12 @@
 
     <div class="mb-6 flex justify-between items-center">
         <div>
-            <h1 class="text-2xl font-bold text-gray-800">Quản lý Bệnh án</h1>
+            <h1 class="text-2xl font-bold text-gray-800">Quản lý Hồ sơ khám</h1>
             <p class="text-sm text-gray-500 mt-1">Lưu trữ các hồ sơ chẩn đoán, điều trị bệnh nhân</p>
         </div>
         <button onclick="openCreate()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" /></svg>
-            Tạo Bệnh án mới
+            Tạo Hồ sơ khám
         </button>
     </div>
 

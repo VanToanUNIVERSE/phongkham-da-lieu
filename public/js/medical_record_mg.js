@@ -1,4 +1,4 @@
-﻿const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
 const id = document.getElementById('id');
 const appointmentId = document.getElementById('appointment_id');
@@ -67,7 +67,7 @@ function loadData() {
         let html = `
             <thead class="bg-gray-50 border-b border-gray-200 text-sm md:text-base text-gray-600 tracking-wider">
                 <tr>
-                    <th class="py-4 px-6 font-semibold w-24">Mã Bệnh Án</th>
+                    <th class="py-4 px-6 font-semibold w-24">Mã Hồ Sơ Khám</th>
                     <th class="py-4 px-6 font-semibold">Bác sĩ chủ trị</th>
                     <th class="py-4 px-6 font-semibold">Tên bệnh nhân</th>
                     <th class="py-4 px-6 font-semibold">Chẩn đoán</th>
@@ -142,7 +142,7 @@ function save() {
                 closeModal();
             }
             else {
-                // Hiển thị lỗi mới form Bệnh Án
+                // Hiển thị lỗi mới form Hồ Sơ Khám
                 for (let field in data.errors) {
                     let errEl = document.getElementById('err_' + field);
                     if (errEl) {
@@ -169,7 +169,7 @@ function edit(nid) {
     const btn = document.getElementById('submitBtn');
     if(btn) btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Cập nhật';
     openModal();
-    document.getElementById('title').innerText = "Sửa bệnh án";
+    document.getElementById('title').innerText = "Sửa Hồ sơ khám";
         // Clear errors
     document.querySelectorAll('[id^="err_"]').forEach(el => {
         el.innerText = "";
@@ -200,7 +200,7 @@ function edit(nid) {
 
 
 function del(nid) {
-    showDeleteConfirm(nid, 'mục Bệnh án này', '/medical_records');
+    showDeleteConfirm(nid, 'Hồ sơ khám này', '/medical_records');
 }
 
 

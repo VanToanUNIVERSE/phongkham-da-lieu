@@ -13,8 +13,26 @@
         </button>
     </div>
 
-    <!-- 6 CARDS TỔNG QUAN -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <!-- 8 CARDS TỔNG QUAN -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Doanh Thu Tháng Này -->
+        <div class="bg-gradient-to-r from-teal-500 to-teal-600 rounded-xl border border-teal-400 p-6 shadow-md hover:shadow-lg transition-all relative overflow-hidden group text-white">
+            <svg class="absolute right-0 top-0 h-full w-32 opacity-10 transform translate-x-10 group-hover:translate-x-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <div class="flex flex-col relative z-10">
+                <p class="text-teal-100 font-medium text-sm mb-1">DOANH THU THÁNG NÀY</p>
+                <h3 class="text-3xl font-bold tracking-tight">{{ number_format($revenueThisMonth ?? 0, 0, ',', '.') }}<span class="text-lg font-normal ml-1">VNĐ</span></h3>
+            </div>
+        </div>
+
+        <!-- Doanh Thu Năm Nay -->
+        <div class="bg-gradient-to-r from-amber-500 to-amber-600 rounded-xl border border-amber-400 p-6 shadow-md hover:shadow-lg transition-all relative overflow-hidden group text-white">
+            <svg class="absolute right-0 top-0 h-full w-32 opacity-10 transform translate-x-10 group-hover:translate-x-5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+            <div class="flex flex-col relative z-10">
+                <p class="text-amber-100 font-medium text-sm mb-1">DOANH THU NĂM NAY</p>
+                <h3 class="text-3xl font-bold tracking-tight">{{ number_format($revenueThisYear ?? 0, 0, ',', '.') }}<span class="text-lg font-normal ml-1">VNĐ</span></h3>
+            </div>
+        </div>
         
         <!-- Tổng Bệnh Nhân -->
         <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -58,16 +76,12 @@
             </div>
         </div>
 
-        <!-- Hồ Sơ Bệnh Án -->
-        <div class="bg-white rounded-xl border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
-            <div class="absolute right-0 top-0 h-full w-2 bg-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-            <div class="flex items-center gap-4">
-                <div class="p-3 bg-rose-50 rounded-lg text-rose-600">
-                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                </div>
-                <div>
-                    <p class="text-sm font-medium text-gray-500">Hồ Sơ Đã Lập</p>
-                    <h3 class="text-3xl font-bold text-gray-800 tracking-tight">{{ number_format($totalRecords) }}</h3>
+        <!-- Hồ Sơ Khám -->
+        <div class="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-2xl shadow border border-indigo-200 p-6 flex items-center justify-between">
+            <div>
+                <p class="text-sm font-semibold text-indigo-700 uppercase tracking-wider mb-2">Hồ Sơ Khám</p>
+                <div class="flex items-end gap-3">
+                    <h3 class="text-4xl font-extrabold text-indigo-900 border-b-2 border-indigo-300 pb-1">{{ number_format($medicalRecordsCount ?? 0) }}</h3>
                 </div>
             </div>
         </div>

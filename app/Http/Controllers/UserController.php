@@ -160,8 +160,8 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Không thể xóa người dùng này vì có dữ liệu ràng buộc (VD: Lịch khám, Bệnh án...)'
-            ], 500);
+                'message' => 'Không thể xóa người dùng này vì có dữ liệu ràng buộc (VD: Lịch khám, Hồ sơ khám...)'
+            ], 400);
         }
     }
 }

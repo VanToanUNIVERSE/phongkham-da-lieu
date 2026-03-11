@@ -10,6 +10,8 @@ use App\Models\Appointment;
 use App\Models\Medicine;
 use App\Models\Prescription;
 use App\Models\MedicalRecord;
+use App\Models\Invoice;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -21,6 +23,17 @@ class ReportController extends Controller
         $totalUsers = User::count();
         $totalPrescriptions = Prescription::count();
         $totalRecords = MedicalRecord::count();
+
+        // 1. Lấy Doanh thu Tháng này
+        $revenueThisMonth = Invoice::where('status', 'paid')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('total_amount');
+
+        // 2. Lấy Doanh thu Năm nay
+        $revenueThisYear = Invoice::where('status', 'paid')
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('total_amount');
 
         // Lấy 5 cuộc hẹn mới nhất hôm nay hoặc sắp tới
         $recentAppointments = Appointment::with(['patient', 'doctor.user'])
@@ -37,7 +50,9 @@ class ReportController extends Controller
             'totalUsers',
             'totalPrescriptions',
             'totalRecords',
-            'recentAppointments'
+            'recentAppointments',
+            'revenueThisMonth',
+            'revenueThisYear'
         ));
     }
 }

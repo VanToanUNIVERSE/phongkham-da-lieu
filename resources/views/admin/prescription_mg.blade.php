@@ -16,7 +16,7 @@
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-200 text-sm md:text-base text-gray-600 uppercase tracking-wider">
                         <th class="py-4 px-6 font-medium">Mã đơn</th>
-                        <th class="py-4 px-6 font-medium">Mã Bệnh án</th>
+                        <th class="py-4 px-6 font-medium">Mã Hồ sơ khám</th>
                         <th class="py-4 px-6 font-medium">Nhân viên phát</th>
                         <th class="py-4 px-6 font-medium">Nội dung</th>
                         <th class="py-4 px-6 font-medium">Trạng thái</th>
@@ -92,9 +92,9 @@
                     <!-- HEADER INFO (Grid 2 Cột) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mã bệnh án <span class="text-red-500">*</span></label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-1">Mã hồ sơ khám <span class="text-red-500">*</span></label>
                             <select id="medical_record_id" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring-blue-500 transition-colors">
-                                <option value="">Chọn mã bệnh án</option>
+                                <option value="">Chọn mã hồ sơ khám</option>
                                 @foreach ($medical_records as $a)
                                     <option value="{{ $a->id }}">BA-{{ $a->id }} (BN: {{ $a->patient->full_name ?? 'N/A' }})</option>
                                 @endforeach
