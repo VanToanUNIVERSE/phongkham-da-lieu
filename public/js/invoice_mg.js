@@ -43,13 +43,26 @@ function loadData() {
                         <td class="px-6 py-4 text-gray-500">${methodBadge}</td>
                         <td class="px-6 py-4 text-gray-500 text-sm">${item.created_at}</td>
                         <td class="px-6 py-4 text-center">
-                            <div class="flex items-center justify-center gap-2">
+                            <div class="flex items-center justify-center gap-2">`;
+                    
+                    if (window.isReceptionistUser) {
+                        // Receptionists only get a "Sửa trạng thái" (Edit Status) button
+                        html += `
+                                <button onclick="edit(${item.id})" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors" title="Cập nhật trạng thái">
+                                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </button>`;
+                    } else {
+                        // Admins keep the standard full Edit and Delete buttons
+                        html += `
                                 <button onclick="edit(${item.id})" class="text-blue-600 hover:text-blue-900 bg-blue-50 hover:bg-blue-100 p-2 rounded-lg transition-colors" title="Sửa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                 </button>
                                 <button onclick="del(${item.id})" class="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 p-2 rounded-lg transition-colors" title="Xóa">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                </button>
+                                </button>`;
+                    }
+
+                    html += `
                             </div>
                         </td>
                     </tr>`;
@@ -136,12 +149,32 @@ function resetForm() {
     document.getElementById("payment_method").value = "";
     document.getElementById("errors").classList.add("hidden");
     
+    // Khôi phục giao diện gốc cho Modal
+    const footer = document.getElementById("modalFooter");
+    if (footer) {
+        footer.innerHTML = `
+            <button type="button" onclick="closeModal()" class="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors shadow-sm">
+                Hủy bỏ
+            </button>
+            <button type="button" id="submitBtn" onclick="save()" class="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-sm flex items-center gap-2">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Lưu Hóa Đơn
+            </button>
+        `;
+    }
+    const statusWrapper = document.getElementById("statusWrapper");
+    if(statusWrapper) statusWrapper.classList.remove("hidden");
+    const paymentWrapper = document.getElementById("paymentMethodWrapper");
+    if(paymentWrapper) paymentWrapper.classList.remove("col-span-2");
+    
     // Reset red borders
     const fields = ['medical_record_id', 'examination_fee', 'status', 'payment_method'];
     fields.forEach(field => {
         const input = document.getElementById(field);
         if(input) {
             input.classList.remove('border-red-500', 'ring-red-200');
+            input.disabled = false; // Re-enable for Add New
+            input.classList.remove("bg-gray-50", "cursor-not-allowed"); // Clean up receptionist locks
             const errorText = document.getElementById('error-' + field);
             if(errorText) errorText.classList.add('hidden');
         }
@@ -232,8 +265,61 @@ function edit(id) {
             
             // Đổi giao diện nút cập nhật
             const submitBtn = document.getElementById("submitBtn");
-            submitBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Cập nhật Hóa Đơn';
+            if (submitBtn) {
+                submitBtn.innerHTML = '<svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Cập nhật Hóa Đơn';
+            }
             
+            if (window.isReceptionistUser) {
+                document.getElementById("medical_record_id").setAttribute("readonly", true);
+                document.getElementById("medical_record_id").classList.add("bg-gray-50", "pointer-events-none");
+                
+                document.getElementById("examination_fee").setAttribute("readonly", true);
+                document.getElementById("examination_fee").classList.add("bg-gray-50", "pointer-events-none");
+                
+                document.getElementById("modalTitle").innerText = "Thông tin thanh toán hóa đơn";
+                
+                // Ẩn field Trạng thái đi, chỉ dựa vào 2 Nút Xác Nhận / Hủy dưới cùng
+                document.getElementById("statusWrapper").classList.add("hidden");
+                // Mở rộng phần Phương thức thanh toán ra 2 cột cho cân đối
+                document.getElementById("paymentMethodWrapper").classList.add("col-span-2");
+                
+                // Đổi Footer tùy theo Trạng thái Đơn
+                const footer = document.getElementById("modalFooter");
+                footer.className = "mt-6 flex flex-wrap justify-end gap-3"; // update flex container
+                if (data.status === 'pending') {
+                    footer.innerHTML = `
+                        <button type="button" onclick="closeModal()" class="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors shadow-sm">
+                            Đóng
+                        </button>
+                        <button type="button" onclick="saveStatus('cancelled')" class="px-5 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium transition-colors shadow-sm flex items-center gap-2">
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            Hủy đơn
+                        </button>
+                        <button type="button" onclick="saveStatus('paid')" class="px-5 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors shadow-sm flex items-center gap-2">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Xác nhận thanh toán
+                        </button>
+                    `;
+                    document.getElementById("payment_method").disabled = false;
+                    document.getElementById("payment_method").classList.remove("bg-gray-50", "cursor-not-allowed");
+                } else {
+                    // Nếu đã thanh toán hoặc hủy thì chỉ hiện 1 nút đóng để xem
+                    footer.innerHTML = `
+                        <button type="button" onclick="closeModal()" class="px-5 py-2 border border-blue-300 rounded-lg text-blue-700 hover:bg-blue-50 font-medium transition-colors shadow-sm w-full">
+                            Đóng thông tin (Hóa đơn đã chốt)
+                        </button>
+                    `;
+                    document.getElementById("payment_method").disabled = true;
+                    document.getElementById("payment_method").classList.add("bg-gray-50", "cursor-not-allowed");
+                }
+            } else {
+                document.getElementById("medical_record_id").removeAttribute("readonly");
+                document.getElementById("medical_record_id").classList.remove("bg-gray-50", "pointer-events-none");
+                
+                document.getElementById("examination_fee").removeAttribute("readonly");
+                document.getElementById("examination_fee").classList.remove("bg-gray-50", "pointer-events-none");
+            }
+
             document.getElementById("errors").classList.add("hidden");
             const modal = document.getElementById("modal");
             modal.classList.remove("hidden");
@@ -250,4 +336,22 @@ function edit(id) {
 
 function del(nid) {
     showDeleteConfirm(nid, 'Hóa đơn này', '/invoices');
+}
+
+// Function dành riêng cho Lễ tân
+function saveStatus(newStatus) {
+    document.getElementById("status").value = newStatus;
+    
+    // Yêu cầu phương thức thanh toán nếu xác nhận đóng tiền
+    if (newStatus === 'paid') {
+        if (!document.getElementById("payment_method").value) {
+            document.getElementById("errors").innerHTML = "<strong>Vui lòng kiểm tra lại:</strong><ul><li>- Bạn chưa chọn Phương thức thanh toán khi xác nhận lấy tiền.</li></ul>";
+            document.getElementById("errors").classList.remove("hidden");
+            document.getElementById("payment_method").classList.add('border-red-500', 'ring-red-200');
+            return;
+        }
+    }
+    
+    // Nếu pass điều kiện thì lưu vào Database dựa theo API Save mặc định
+    save();
 }

@@ -53,9 +53,7 @@ Route::get('/doctor/dashboard', function(){
     return "Doctor Dashboard";
 })->middleware('auth');
 
-Route::get('/reception/dashboard', function(){
-    return "Reception Dashboard";
-})->middleware('auth');
+Route::get('/reception/dashboard', [\App\Http\Controllers\ReceptionController::class, 'index'])->middleware('auth');
 
 Route::get('/pharmacy/dashboard', function(){
     return "Pharmacy Dashboard";

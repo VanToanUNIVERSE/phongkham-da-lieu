@@ -130,7 +130,8 @@
             // reset form
             document.getElementById('userForm').reset();
             form = document.getElementById("userForm");
-            form.action = "/users/" ;
+            form.action = "{{ route('users.store') }}" ;
+            document.getElementById('formMethod').value = "POST";
 
             // title
             document.getElementById('modal-title').innerText = "Thêm người dùng";

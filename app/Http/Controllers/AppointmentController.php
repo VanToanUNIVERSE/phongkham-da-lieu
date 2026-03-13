@@ -16,7 +16,19 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        $appointments = Appointment::with(['doctor.user', 'patient'])->get();
+        $appointments = Appointment::with(['doctor.user', 'patient'])
+            ->orderByRaw("
+                CASE status
+                    WHEN 'pending' THEN 1
+                    WHEN 'confirmed' THEN 2
+                    WHEN 'completed' THEN 3
+                    WHEN 'cancelled' THEN 4
+                    ELSE 5
+                END ASC
+            ")
+            ->orderBy('date', 'asc')
+            ->orderBy('time', 'asc')
+            ->get();
         $doctors = Doctor::with('user')->get();
         $patients = Patient::all();
         return view('admin.appointment_mg', compact('appointments', 'doctors', 'patients'));
@@ -126,7 +138,19 @@ class AppointmentController extends Controller
     }
 
     function loadData() {
-        $appointments = Appointment::with(['doctor.user', 'patient'])->get();
+        $appointments = Appointment::with(['doctor.user', 'patient'])
+            ->orderByRaw("
+                CASE status
+                    WHEN 'pending' THEN 1
+                    WHEN 'confirmed' THEN 2
+                    WHEN 'completed' THEN 3
+                    WHEN 'cancelled' THEN 4
+                    ELSE 5
+                END ASC
+            ")
+            ->orderBy('date', 'asc')
+            ->orderBy('time', 'asc')
+            ->get();
         return response()->json([
             'appointments' => $appointments
         ]);

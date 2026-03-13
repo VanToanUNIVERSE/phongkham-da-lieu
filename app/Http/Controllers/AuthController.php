@@ -31,15 +31,21 @@ class AuthController extends Controller
             if($role == "Admin") {
                 return redirect("/admin/dashboard");
             }
-            if($role == "Bác sĩ") {
+            if($role == "Bác sĩ" || $role == "Bác sĩ") {
                 return redirect("/doctor/dashboard");
             }
-            if($role == "Lễ tân") {
+            if($role == "Lễ tân" || $role == "Lễ tân") {
                 return redirect("/reception/dashboard");
             }
-            if($role == "Nhân viên phát thuốc") {
+            if($role == "Nhân viên phát thuốc" || $role == "Nhân viên phát thuốc") {
                 return redirect("/pharmacy/dashboard");
             }
+
+            // Fallback in case of an unknown role or normalization issue
+            Auth::logout();
+            return back()->withErrors([
+                'login' => 'Tài khoản chưa được phân quyền truy cập hệ thống.'
+            ]);
         }
 
         return back()->withErrors([

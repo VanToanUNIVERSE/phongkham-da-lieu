@@ -4,11 +4,22 @@
 <div class="p-6">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-2xl font-bold text-gray-800">Quản lý hóa đơn</h2>
-        <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition-colors flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            Tạo hóa đơn
-        </button>
+        @php
+            $isReceptionist = in_array(auth()->user()->role->name, ['Lễ tân', 'Lễ tân']);
+        @endphp
+        
+        @if(!$isReceptionist)
+            <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow-sm font-medium transition-colors flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                Tạo hóa đơn
+            </button>
+        @endif
     </div>
+
+    <!-- Script truyền quyền từ Blade sang JS -->
+    <script>
+        window.isReceptionistUser = @json($isReceptionist);
+    </script>
 
     <!-- Bảng Dữ Liệu -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -84,7 +95,7 @@
 
                     <div class="grid grid-cols-2 gap-4">
                         <!-- Trạng thái -->
-                        <div>
+                        <div id="statusWrapper">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Trạng thái</label>
                             <select id="status" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 px-3 py-2 transition-colors">
                                 <option value="pending">Chưa thanh toán</option>
@@ -95,7 +106,7 @@
                         </div>
 
                         <!-- Phương thức thanh toán -->
-                        <div>
+                        <div id="paymentMethodWrapper">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Phương thức thanh toán</label>
                             <select id="payment_method" class="w-full border-gray-300 rounded-lg shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 px-3 py-2 transition-colors">
                                 <option value="">-- Chọn phương thức --</option>
@@ -108,7 +119,7 @@
                     </div>
                 </div>
 
-                <div class="mt-8 flex justify-end gap-3">
+                <div class="mt-8 flex justify-end gap-3" id="modalFooter">
                     <button type="button" onclick="closeModal()" class="px-5 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors shadow-sm">
                         Hủy bỏ
                     </button>
@@ -122,5 +133,5 @@
     </div>
 </div>
 
-<script src="{{ asset('js/invoice_mg.js') }}"></script>
+<script src="{{ asset('js/invoice_mg.js') }}?v={{ time() }}"></script>
 @endsection

@@ -86,31 +86,47 @@ class InvoiceController extends Controller
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'medical_record_id' => 'required|exists:medical_records,id',
-            'examination_fee' => 'required|numeric|min:0',
-            'status' => 'required',
-        ]);
-
         $invoice = Invoice::findOrFail($id);
-        $medicalRecord = \App\Models\MedicalRecord::with('prescriptions.items.medicine')->findOrFail($request->medical_record_id);
-        
-        $medicineFee = 0;
-        if ($medicalRecord->prescriptions) {
-            $medicineFee = $medicalRecord->prescriptions->total_cost;
+        $isReceptionist = in_array(auth()->user()->role->name ?? '', ['Lễ tân', 'Lễ tân']);
+
+        if ($isReceptionist) {
+            // Receptionists can only update status and payment method
+            $request->validate([
+                'status' => 'required',
+            ]);
+            
+            $invoice->update([
+                'status' => $request->status,
+                'payment_method' => $request->payment_method,
+            ]);
+            
+        } else {
+            // Admins update everything
+            $request->validate([
+                'medical_record_id' => 'required|exists:medical_records,id',
+                'examination_fee' => 'required|numeric|min:0',
+                'status' => 'required',
+            ]);
+
+            $medicalRecord = \App\Models\MedicalRecord::with('prescriptions.items.medicine')->findOrFail($request->medical_record_id);
+            
+            $medicineFee = 0;
+            if ($medicalRecord->prescriptions) {
+                $medicineFee = $medicalRecord->prescriptions->total_cost;
+            }
+
+            $totalAmount = $medicineFee + $request->examination_fee;
+
+            $invoice->update([
+                'patient_id' => $medicalRecord->patient_id,
+                'medical_record_id' => $medicalRecord->id,
+                'examination_fee' => $request->examination_fee,
+                'medicine_fee' => $medicineFee,
+                'total_amount' => $totalAmount,
+                'status' => $request->status,
+                'payment_method' => $request->payment_method,
+            ]);
         }
-
-        $totalAmount = $medicineFee + $request->examination_fee;
-
-        $invoice->update([
-            'patient_id' => $medicalRecord->patient_id,
-            'medical_record_id' => $medicalRecord->id,
-            'examination_fee' => $request->examination_fee,
-            'medicine_fee' => $medicineFee,
-            'total_amount' => $totalAmount,
-            'status' => $request->status,
-            'payment_method' => $request->payment_method,
-        ]);
 
         return response()->json(['status' => 'success', 'message' => 'Cập nhật hóa đơn thành công!']);
     }
