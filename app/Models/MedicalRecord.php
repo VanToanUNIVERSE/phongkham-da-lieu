@@ -29,7 +29,7 @@ class MedicalRecord extends Model
     {
         return $this->belongsTo(Appointment::class);
     }
-    public function prescriptions() {
+    public function prescription() {
         return $this->hasOne(Prescription::class);
     }
 }

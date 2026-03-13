@@ -94,6 +94,12 @@ class PrescriptionController extends Controller
                 ]);
             }
 
+            // 🔥 Tự động cập nhật trạng thái lịch hẹn sang 'complete' (Hệ thống hóa theo yêu cầu: Lễ tân không chỉnh, BS kê toa xong là Hoàn thành)
+            $record = MedicalRecord::find($data['medical_record_id']);
+            if ($record && $record->appointment_id) {
+                \App\Models\Appointment::where('id', $record->appointment_id)->update(['status' => 'complete']);
+            }
+
         });
 
         return response()->json([
