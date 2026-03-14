@@ -32,4 +32,9 @@ class MedicalRecord extends Model
     public function prescription() {
         return $this->hasOne(Prescription::class);
     }
+
+    public function invoice()
+    {
+        return $this->hasOne(Invoice::class);
+    }
 }

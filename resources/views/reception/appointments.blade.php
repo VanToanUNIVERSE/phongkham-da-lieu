@@ -25,18 +25,6 @@
             <span id="statusBadge" class="px-3 py-1 rounded-full text-xs font-semibold border">—</span>
         </div>
 
-        {{-- Tabs --}}
-        <div class="flex border-b border-gray-200 flex-shrink-0 bg-white">
-            <button onclick="switchTab('info')" id="tab-info"
-                class="flex-1 py-3 text-sm font-semibold border-b-2 transition-colors border-blue-600 text-blue-600">
-                👤 Thông tin BN
-            </button>
-            <button onclick="switchTab('invoice')" id="tab-invoice"
-                class="flex-1 py-3 text-sm font-semibold border-b-2 transition-colors border-transparent text-gray-500 hover:text-gray-700">
-                🧾 Hóa đơn
-            </button>
-        </div>
-
         {{-- Scrollable Content --}}
         <div class="flex-1 overflow-y-auto">
 
@@ -55,66 +43,22 @@
                     <p><span class="text-gray-600 w-24 inline-block">Ngày:</span> <span id="panelAptDate" class="font-medium text-gray-800">—</span></p>
                     <p><span class="text-gray-600 w-24 inline-block">Giờ:</span> <span id="panelAptTime" class="font-medium text-gray-800">—</span></p>
                 </div>
-            </div>
 
-            {{-- TAB: HÓA ĐƠN --}}
-            <div id="tab-content-invoice" class="p-6 hidden">
-                {{-- Existing invoice --}}
-                <div id="existingInvoiceBox" class="hidden bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-                    <div class="flex justify-between items-center mb-3">
-                        <p class="text-sm font-bold text-green-700">✅ Hóa đơn đã tạo</p>
-                        <span id="invStatusBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full"></span>
-                    </div>
-                    <div class="text-sm space-y-1.5">
-                        <p class="flex justify-between"><span class="text-gray-600">Phí khám:</span><strong id="invExamFee" class="text-gray-800">—</strong></p>
-                        <p class="flex justify-between"><span class="text-gray-600">Phí thuốc:</span><strong id="invMedFee" class="text-gray-800">—</strong></p>
-                        <p class="flex justify-between border-t border-green-200 pt-2 mt-2"><span class="text-gray-700 font-semibold">Tổng cộng:</span><strong id="invTotal" class="text-green-700 text-lg">—</strong></p>
-                    </div>
-                    {{-- Confirm payment --}}
-                    <div id="confirmPayBox" class="mt-4 pt-3 border-t border-green-200 hidden">
-                        <p class="text-sm font-semibold text-gray-700 mb-2">Xác nhận thanh toán</p>
-                        <select id="payMethod" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:border-blue-500 mb-2">
-                            <option value="cash">Tiền mặt</option>
-                            <option value="bank_transfer">Chuyển khoản</option>
-                            <option value="card">Thẻ</option>
-                        </select>
-                        <button onclick="confirmPayment()" class="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg text-sm transition-colors">
-                            ✓ Xác nhận đã thanh toán
-                        </button>
-                    </div>
-                </div>
-
-                {{-- No invoice yet --}}
-                <div id="noInvoiceBox" class="hidden">
-                    <div id="noRecordNote" class="hidden bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4 text-sm text-yellow-800">
-                        ⚠️ Bác sĩ chưa tạo hồ sơ khám. Chưa thể lập hóa đơn.
-                    </div>
-                    <div id="createInvoiceForm" class="hidden">
-                        <p class="text-sm font-semibold text-gray-700 mb-3">Tạo hóa đơn thu phí</p>
-                        <div class="mb-3">
-                            <label class="text-xs font-medium text-gray-600 mb-1 block">Phí khám (VNĐ) <span class="text-red-500">*</span></label>
-                            <input type="number" id="examinationFee" min="0" placeholder="100000"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+                {{-- Link sang trang Hóa đơn (chỉ hiện khi đã hoàn thành) --}}
+                <div id="invoiceLinkBox" class="hidden mt-4">
+                    <a href="{{ route('reception.invoices') }}"
+                       class="flex items-center justify-between w-full px-4 py-3 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl transition-colors group">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-600 group-hover:bg-emerald-200">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-emerald-800">Quản lý hóa đơn</p>
+                                <p class="text-xs text-emerald-600">Ca khám đã hoàn thành — bấm để thu phí</p>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label class="text-xs font-medium text-gray-600 mb-1 block">Phí thuốc (tự tính)</label>
-                            <input type="text" id="medicineFeeDisplay" readonly
-                                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500">
-                        </div>
-                        <div class="mb-4">
-                            <label class="text-xs font-medium text-gray-600 mb-1 block">Phương thức thanh toán</label>
-                            <select id="paymentMethod" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:border-blue-500">
-                                <option value="cash">Tiền mặt</option>
-                                <option value="bank_transfer">Chuyển khoản</option>
-                                <option value="card">Thẻ</option>
-                            </select>
-                        </div>
-                        <button onclick="createInvoice()" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-colors flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                            Tạo hóa đơn
-                        </button>
-                        <p id="invoiceMsg" class="text-center text-sm mt-2 font-medium"></p>
-                    </div>
+                        <svg class="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </a>
                 </div>
             </div>
 
@@ -382,8 +326,6 @@ function filterByStatus(status) {
 // =========================================================
 function openPanel(a) {
     currentAptId = a.id;
-    currentRecordId = null;
-    currentInvoiceId = null;
 
     const pt  = a.patient || {};
     const dr  = a.doctor && a.doctor.user ? a.doctor.user : {};
@@ -410,13 +352,15 @@ function openPanel(a) {
 
     const statusBadge = document.getElementById('statusBadge');
     statusBadge.innerText = statusLabel;
-    statusBadge.className = `px-3 py-1 rounded-full text-xs font-semibold border ` + {
+    statusBadge.className = `px-3 py-1 rounded-full text-xs font-semibold border ` + ({
         pending:   'bg-yellow-50 text-yellow-700 border-yellow-200',
         inprocess: 'bg-blue-50 text-blue-700 border-blue-200',
         complete:  'bg-green-50 text-green-700 border-green-200',
-    }[a.status];
+    }[a.status] || '');
 
-    switchTab('info');
+    // Show/hide invoice link based on status
+    const invLink = document.getElementById('invoiceLinkBox');
+    if (invLink) invLink.classList.toggle('hidden', a.status !== 'complete');
 
     document.getElementById('examPanel').classList.remove('hidden');
     setTimeout(() => {
@@ -434,109 +378,7 @@ function closePanel() {
 
 
 
-// =========================================================
-// TABS (panel)
-// =========================================================
-function switchTab(tab) {
-    ['info', 'invoice'].forEach(t => {
-        const btn = document.getElementById('tab-' + t);
-        const content = document.getElementById('tab-content-' + t);
-        if (t === tab) {
-            btn.classList.add('border-blue-600', 'text-blue-600');
-            btn.classList.remove('border-transparent', 'text-gray-500');
-            content.classList.remove('hidden');
-        } else {
-            btn.classList.remove('border-blue-600', 'text-blue-600');
-            btn.classList.add('border-transparent', 'text-gray-500');
-            content.classList.add('hidden');
-        }
-    });
-
-    if (tab === 'invoice') loadInvoiceTab();
-}
-
-// =========================================================
-// INVOICE TAB
-// =========================================================
-function loadInvoiceTab() {
-    fetch(`/reception/appointments/${currentAptId}/invoice`)
-    .then(r => r.json())
-    .then(data => {
-        document.getElementById('existingInvoiceBox').classList.add('hidden');
-        document.getElementById('noInvoiceBox').classList.add('hidden');
-
-        if (data.invoice) {
-            currentInvoiceId = data.invoice.id;
-            const inv = data.invoice;
-            const fmt = v => Number(v).toLocaleString('vi-VN') + ' đ';
-            document.getElementById('invExamFee').innerText = fmt(inv.examination_fee);
-            document.getElementById('invMedFee').innerText  = fmt(inv.medicine_fee);
-            document.getElementById('invTotal').innerText   = fmt(inv.total_amount);
-
-            const isPaid = inv.status === 'paid';
-            const badge  = document.getElementById('invStatusBadge');
-            badge.className = `text-xs font-semibold px-2.5 py-1 rounded-full ${isPaid ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`;
-            badge.innerText = isPaid ? '✅ Đã thanh toán' : '⏳ Chờ thanh toán';
-
-            document.getElementById('confirmPayBox').classList.toggle('hidden', isPaid);
-            document.getElementById('existingInvoiceBox').classList.remove('hidden');
-        } else {
-            document.getElementById('noInvoiceBox').classList.remove('hidden');
-            if (!data.record) {
-                document.getElementById('noRecordNote').classList.remove('hidden');
-                document.getElementById('createInvoiceForm').classList.add('hidden');
-            } else {
-                currentRecordId = data.record.id;
-                document.getElementById('noRecordNote').classList.add('hidden');
-                document.getElementById('createInvoiceForm').classList.remove('hidden');
-                const fmt = data.medicine_fee ? Number(data.medicine_fee).toLocaleString('vi-VN') + ' đ' : '0 đ';
-                document.getElementById('medicineFeeDisplay').value = fmt;
-            }
-        }
-    })
-    .catch(e => console.error(e));
-}
-
-function createInvoice() {
-    const msgEl = document.getElementById('invoiceMsg');
-    const fee = document.getElementById('examinationFee').value;
-    if (!fee) { msgEl.className = 'text-red-500 text-sm mt-2 font-medium text-center'; msgEl.innerText = 'Nhập phí khám'; return; }
-
-    fetch('/invoices', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-            medical_record_id: currentRecordId,
-            examination_fee:   fee,
-            status:            'pending',
-            payment_method:    document.getElementById('paymentMethod').value
-        })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'success') {
-            msgEl.className = 'text-green-600 text-sm mt-2 font-medium text-center';
-            msgEl.innerText = '✓ ' + data.message;
-            setTimeout(loadInvoiceTab, 600);
-        } else {
-            msgEl.className = 'text-red-500 text-sm mt-2 font-medium text-center';
-            msgEl.innerText = data.message || 'Lỗi xảy ra';
-        }
-    })
-    .catch(e => console.error(e));
-}
-
-function confirmPayment() {
-    const method = document.getElementById('payMethod').value;
-    fetch(`/invoices/${currentInvoiceId}`, {
-        method: 'PUT',
-        headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ status: 'paid', payment_method: method })
-    })
-    .then(r => r.json())
-    .then(data => { if (data.status === 'success') loadInvoiceTab(); })
-    .catch(e => console.error(e));
-}
+// No invoice functions needed here — managed in reception/invoices page
 
 // =========================================================
 // NEW APPOINTMENT MODAL

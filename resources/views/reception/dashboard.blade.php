@@ -14,7 +14,7 @@
 </div>
 
 <!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mb-8">
     <!-- Card 1 -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center transition-transform hover:-translate-y-1 duration-300">
         <div class="p-4 bg-blue-50 text-blue-600 rounded-lg mr-4">
@@ -47,29 +47,15 @@
             <h3 class="text-2xl font-bold text-gray-800">{{ $invoicesTodayCount }}</h3>
         </div>
     </div>
-    
-    <!-- Quick Actions Card -->
-    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl shadow-sm p-6 text-white flex flex-col justify-center relative overflow-hidden">
-        <!-- Decorative bg -->
-        <svg class="absolute -right-4 -bottom-4 w-32 h-32 text-white opacity-10" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"></path></svg>
-        
-        <h3 class="text-lg font-bold mb-2 relative z-10">Thao tác nhanh</h3>
-        <div class="flex gap-2 relative z-10">
-            <a href="{{ route('appointments.index') }}" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded text-sm transition-colors text-white backdrop-blur">
-                + Lịch khám
-            </a>
-            <a href="{{ route('patients.index') }}" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded text-sm transition-colors text-white backdrop-blur">
-                + Bệnh nhân
-            </a>
-        </div>
-    </div>
 </div>
+
+<div class="mb-8"></div>
 
 <!-- Lịch khám sắp tới -->
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
         <h3 class="text-lg font-bold text-gray-800">Lịch khám hôm nay (Tới gần nhất)</h3>
-        <a href="{{ route('appointments.index') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Xem tất cả &rarr;</a>
+        <a href="{{ route('reception.appointments') }}" class="text-sm text-blue-600 hover:text-blue-800 font-medium">Xem tất cả &rarr;</a>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">

@@ -117,21 +117,109 @@ class ReceptionController extends Controller
      */
     public function getAppointmentInvoice(Appointment $appointment)
     {
-        $record  = MedicalRecord::where('appointment_id', $appointment->id)->first();
-        $invoice = null;
+        $record = MedicalRecord::with(['prescription', 'doctor.user', 'patient'])
+            ->where('appointment_id', $appointment->id)
+            ->first();
+
+        $invoice     = null;
         $medicineFee = 0;
 
         if ($record) {
             $invoice = Invoice::where('medical_record_id', $record->id)->first();
-            if ($record->prescriptions) {
-                $medicineFee = $record->prescriptions->total_cost ?? 0;
+            if ($record->prescription) {
+                $medicineFee = $record->prescription->total_cost ?? 0;
             }
         }
 
         return response()->json([
-            'record'      => $record,
-            'invoice'     => $invoice,
+            'record'       => $record,
+            'invoice'      => $invoice,
             'medicine_fee' => $medicineFee,
         ]);
+    }
+
+    /**
+     * Quản lý hóa đơn - Trang danh sách.
+     */
+    public function invoices()
+    {
+        return view('reception.invoices');
+    }
+
+    /**
+     * API: Load danh sách hóa đơn (lịch khám đã hoàn thành).
+     */
+    public function loadInvoices(Request $request)
+    {
+        $date = $request->date ?? today()->toDateString();
+
+        $appointments = Appointment::with([
+                'patient',
+                'doctor.user',
+                'medicalRecord.invoice',
+                'medicalRecord.prescription',
+            ])
+            ->where('status', 'complete')
+            ->whereDate('date', $date)
+            ->orderBy('time', 'desc')
+            ->get();
+
+        return response()->json(['appointments' => $appointments]);
+    }
+
+    /**
+     * Public: Khách hàng đặt lịch không cần đăng nhập.
+     */
+    public function publicBooking(Request $request)
+    {
+        try {
+            $request->validate([
+                'full_name'  => 'required|string|max:100',
+                'phone'      => 'required|string|max:20',
+                'doctor_id'  => 'nullable|exists:doctors,id',
+                'date'       => 'required|date|after_or_equal:today',
+                'time'       => 'required',
+                'birth_year' => 'nullable|integer|min:1900|max:2099',
+                'gender'     => 'nullable|in:0,1',
+                'note'       => 'nullable|string|max:500',
+            ]);
+
+            // Tìm hoặc tạo bệnh nhân theo SĐT
+            $patient = Patient::firstOrCreate(
+                ['phone' => $request->phone],
+                [
+                    'full_name'  => $request->full_name,
+                    'birth_year' => $request->birth_year,
+                    'gender'     => $request->gender ?? null,
+                    'address'    => $request->address ?? null,
+                ]
+            );
+
+            // Nếu bệnh nhân đã tồn tại, cập nhật tên (phòng trường hợp tên thay đổi)
+            if (!$patient->wasRecentlyCreated && $patient->full_name !== $request->full_name) {
+                $patient->update(['full_name' => $request->full_name]);
+            }
+
+            // Nếu không chọn bác sĩ cụ thể, lấy bác sĩ đầu tiên
+            $doctorId = $request->doctor_id ?? Doctor::first()?->id;
+
+            if (!$doctorId) {
+                return response()->json(['status' => 'fail', 'message' => 'Hiện chưa có bác sĩ nào trong hệ thống.'], 422);
+            }
+
+            Appointment::create([
+                'patient_id' => $patient->id,
+                'doctor_id'  => $doctorId,
+                'date'       => $request->date,
+                'time'       => $request->time,
+                'status'     => 'pending',
+            ]);
+
+            return response()->json(['status' => 'success', 'message' => 'Đặt lịch thành công! Phòng khám sẽ liên hệ xác nhận sớm nhất.']);
+        } catch (ValidationException $e) {
+            return response()->json(['status' => 'fail', 'errors' => $e->errors(), 'message' => 'Vui lòng kiểm tra lại thông tin.'], 422);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 'fail', 'message' => 'Có lỗi xảy ra, vui lòng thử lại.'], 500);
+        }
     }
 }

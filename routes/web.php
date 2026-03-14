@@ -7,9 +7,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MedicalRecordController;
 use App\Http\Controllers\MedicineController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Route;
@@ -26,8 +28,14 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    try {
+        $doctors = \App\Models\Doctor::with('user')->get();
+    } catch (\Exception $e) {
+        $doctors = collect();
+    }
+    return view('welcome', compact('doctors'));
+})->name('home');
+Route::post('/dat-lich', [ReceptionController::class, 'publicBooking'])->name('public.booking');
 
 Route::get("/login", [AuthController::class, 'showLogin'])->name("login");
 Route::post("/login", [AuthController::class, "login"])->name("postLogin");
@@ -72,8 +80,17 @@ Route::prefix('reception')->middleware('auth')->group(function () {
     Route::put('/appointments/{appointment}/status', [\App\Http\Controllers\ReceptionController::class, 'updateAppointmentStatus'])->name('reception.appointments.status');
     Route::post('/patients',              [\App\Http\Controllers\ReceptionController::class, 'storePatient'])->name('reception.patients.store');
     Route::get('/appointments/{appointment}/invoice', [\App\Http\Controllers\ReceptionController::class, 'getAppointmentInvoice'])->name('reception.appointments.invoice');
+    Route::get('/invoices',               [\App\Http\Controllers\ReceptionController::class, 'invoices'])->name('reception.invoices');
+    Route::get('/invoices/load',          [\App\Http\Controllers\ReceptionController::class, 'loadInvoices'])->name('reception.invoices.load');
 });
 
-Route::get('/pharmacy/dashboard', function(){
-    return "Pharmacy Dashboard";
-})->middleware('auth');
+Route::prefix('pharmacy')->middleware('auth')->group(function () {
+    Route::get('/dashboard',               [PharmacyController::class, 'index'])->name('pharmacy.dashboard');
+    Route::get('/dispense',                [PharmacyController::class, 'dispense'])->name('pharmacy.dispense');
+    Route::get('/dispense/load',           [PharmacyController::class, 'loadPrescriptions'])->name('pharmacy.dispense.load');
+    Route::post('/dispense/{prescription}',[PharmacyController::class, 'confirmDispense'])->name('pharmacy.dispense.confirm');
+    Route::get('/inventory',               [PharmacyController::class, 'inventory'])->name('pharmacy.inventory');
+    Route::get('/inventory/load',          [PharmacyController::class, 'loadInventory'])->name('pharmacy.inventory.load');
+    Route::post('/inventory/import',       [PharmacyController::class, 'importStock'])->name('pharmacy.inventory.import');
+    Route::get('/transactions',            [PharmacyController::class, 'transactions'])->name('pharmacy.transactions');
+});

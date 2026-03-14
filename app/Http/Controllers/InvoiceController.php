@@ -3,33 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Models\Invoice;
+use App\Models\MedicalRecord;
 use App\Models\Patient;
 
 class InvoiceController extends Controller
 {
     public function index()
     {
-        $medical_records = \App\Models\MedicalRecord::with(['patient', 'prescriptions'])->orderBy('id', 'desc')->get();
+        $medical_records = MedicalRecord::with(['patient', 'prescription'])->orderBy('id', 'desc')->get();
         return view('admin.invoice_mg', compact('medical_records'));
     }
 
     public function loadData(Request $request)
     {
-        $invoices = Invoice::with(['patient', 'medical_record.prescriptions'])
+        $invoices = Invoice::with(['patient', 'medical_record.prescription'])
             ->orderBy('id', 'desc')
             ->get()
             ->map(function ($invoice) {
                 return [
-                    'id' => $invoice->id,
-                    'patient_name' => $invoice->patient->full_name,
-                    'total_amount' => $invoice->total_amount,
+                    'id'              => $invoice->id,
+                    'patient_name'    => $invoice->patient->full_name,
+                    'total_amount'    => $invoice->total_amount,
                     'examination_fee' => $invoice->examination_fee,
-                    'medicine_fee' => $invoice->medicine_fee,
-                    'status' => $invoice->status,
-                    'payment_method' => $invoice->payment_method ?? 'N/A',
-                    'created_at' => $invoice->created_at->format('d/m/Y H:i'),
+                    'medicine_fee'    => $invoice->medicine_fee,
+                    'status'          => $invoice->status,
+                    'payment_method'  => $invoice->payment_method ?? 'N/A',
+                    'created_at'      => $invoice->created_at->format('d/m/Y H:i'),
                 ];
             });
 
@@ -38,13 +38,13 @@ class InvoiceController extends Controller
 
     public function calculateCost($medicalRecordId)
     {
-        $medicalRecord = \App\Models\MedicalRecord::with('prescriptions.items.medicine')->findOrFail($medicalRecordId);
+        $medicalRecord = MedicalRecord::with('prescription.items.medicine')->findOrFail($medicalRecordId);
         $medicineFee = 0;
-        
-        if ($medicalRecord->prescriptions) {
-            $medicineFee = $medicalRecord->prescriptions->total_cost;
+
+        if ($medicalRecord->prescription) {
+            $medicineFee = $medicalRecord->prescription->total_cost ?? 0;
         }
-        
+
         return response()->json(['medicine_fee' => $medicineFee]);
     }
 
@@ -52,27 +52,27 @@ class InvoiceController extends Controller
     {
         $request->validate([
             'medical_record_id' => 'required|exists:medical_records,id',
-            'examination_fee' => 'required|numeric|min:0',
-            'status' => 'required',
+            'examination_fee'   => 'required|numeric|min:0',
+            'status'            => 'required',
         ]);
 
-        $medicalRecord = \App\Models\MedicalRecord::with('prescriptions.items.medicine')->findOrFail($request->medical_record_id);
-        
+        $medicalRecord = MedicalRecord::with('prescription.items.medicine')->findOrFail($request->medical_record_id);
+
         $medicineFee = 0;
-        if ($medicalRecord->prescriptions) {
-            $medicineFee = $medicalRecord->prescriptions->total_cost;
+        if ($medicalRecord->prescription) {
+            $medicineFee = $medicalRecord->prescription->total_cost ?? 0;
         }
 
         $totalAmount = $medicineFee + $request->examination_fee;
 
         Invoice::create([
-            'patient_id' => $medicalRecord->patient_id,
-            'medical_record_id' => $medicalRecord->id,
-            'examination_fee' => $request->examination_fee,
-            'medicine_fee' => $medicineFee,
-            'total_amount' => $totalAmount,
-            'status' => $request->status,
-            'payment_method' => $request->payment_method,
+            'patient_id'       => $medicalRecord->patient_id,
+            'medical_record_id'=> $medicalRecord->id,
+            'examination_fee'  => $request->examination_fee,
+            'medicine_fee'     => $medicineFee,
+            'total_amount'     => $totalAmount,
+            'status'           => $request->status,
+            'payment_method'   => $request->payment_method,
         ]);
 
         return response()->json(['status' => 'success', 'message' => 'Tạo hóa đơn thành công!']);
@@ -87,44 +87,39 @@ class InvoiceController extends Controller
     public function update(Request $request, $id)
     {
         $invoice = Invoice::findOrFail($id);
-        $isReceptionist = in_array(auth()->user()->role->name ?? '', ['Lễ tân', 'Lễ tân']);
+        $isReceptionist = in_array(auth()->user()->role->name ?? '', ['Lễ tân']);
 
         if ($isReceptionist) {
-            // Receptionists can only update status and payment method
-            $request->validate([
-                'status' => 'required',
-            ]);
-            
+            $request->validate(['status' => 'required']);
+
             $invoice->update([
-                'status' => $request->status,
+                'status'         => $request->status,
                 'payment_method' => $request->payment_method,
             ]);
-            
         } else {
-            // Admins update everything
             $request->validate([
                 'medical_record_id' => 'required|exists:medical_records,id',
-                'examination_fee' => 'required|numeric|min:0',
-                'status' => 'required',
+                'examination_fee'   => 'required|numeric|min:0',
+                'status'            => 'required',
             ]);
 
-            $medicalRecord = \App\Models\MedicalRecord::with('prescriptions.items.medicine')->findOrFail($request->medical_record_id);
-            
+            $medicalRecord = MedicalRecord::with('prescription.items.medicine')->findOrFail($request->medical_record_id);
+
             $medicineFee = 0;
-            if ($medicalRecord->prescriptions) {
-                $medicineFee = $medicalRecord->prescriptions->total_cost;
+            if ($medicalRecord->prescription) {
+                $medicineFee = $medicalRecord->prescription->total_cost ?? 0;
             }
 
             $totalAmount = $medicineFee + $request->examination_fee;
 
             $invoice->update([
-                'patient_id' => $medicalRecord->patient_id,
+                'patient_id'        => $medicalRecord->patient_id,
                 'medical_record_id' => $medicalRecord->id,
-                'examination_fee' => $request->examination_fee,
-                'medicine_fee' => $medicineFee,
-                'total_amount' => $totalAmount,
-                'status' => $request->status,
-                'payment_method' => $request->payment_method,
+                'examination_fee'   => $request->examination_fee,
+                'medicine_fee'      => $medicineFee,
+                'total_amount'      => $totalAmount,
+                'status'            => $request->status,
+                'payment_method'    => $request->payment_method,
             ]);
         }
 
