@@ -7,8 +7,11 @@ use App\Models\Doctor;
 use App\Models\Invoice;
 use App\Models\MedicalRecord;
 use App\Models\Patient;
+use App\Models\User;
+use App\Models\Role;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class ReceptionController extends Controller
@@ -108,7 +111,27 @@ class ReceptionController extends Controller
                 'address'    => 'nullable|string',
             ]);
             $patient = Patient::create($data);
-            return response()->json(['status' => 'success', 'message' => 'Đăng ký bệnh nhân thành công', 'patient' => $patient]);
+
+            // Tự động tạo tài khoản nếu có Số điện thoại
+            if ($patient->phone) {
+                $existingUser = User::where('username', $patient->phone)->first();
+                if (!$existingUser) {
+                    $rolePatient = Role::where('name', 'Bệnh nhân')->first();
+                    if ($rolePatient) {
+                        $newUser = User::create([
+                            'username' => $patient->phone,
+                            'full_name' => $patient->full_name,
+                            'password' => Hash::make($patient->phone),
+                            'role_id' => $rolePatient->id,
+                        ]);
+                        $patient->update(['user_id' => $newUser->id]);
+                    }
+                } else {
+                    $patient->update(['user_id' => $existingUser->id]);
+                }
+            }
+
+            return response()->json(['status' => 'success', 'message' => 'Đăng ký bệnh nhân thành công. Tài khoản đã được tự động khởi tạo (Mật khẩu là SĐT).', 'patient' => $patient]);
         } catch (ValidationException $e) {
             return response()->json(['status' => 'fail', 'errors' => $e->errors(), 'message' => 'Lỗi nhập liệu'], 422);
         }
@@ -252,9 +275,28 @@ class ReceptionController extends Controller
                 'status'     => 'unconfirmed',
             ]);
 
+            // Tự động tạo tài khoản nếu chưa có
+            if (!$patient->user_id) {
+                $existingUser = User::where('username', $patient->phone)->first();
+                if (!$existingUser) {
+                    $rolePatient = Role::where('name', 'Bệnh nhân')->first();
+                    if ($rolePatient) {
+                        $newUser = User::create([
+                            'username' => $patient->phone,
+                            'full_name' => $patient->full_name,
+                            'password' => Hash::make($patient->phone),
+                            'role_id' => $rolePatient->id,
+                        ]);
+                        $patient->update(['user_id' => $newUser->id]);
+                    }
+                } else {
+                    $patient->update(['user_id' => $existingUser->id]);
+                }
+            }
+
             return response()->json([
                 'status' => 'success', 
-                'message' => 'Đặt lịch thành công! Mã lịch hẹn của bạn là: ' . $apt->id . '. Vui lòng lưu lại mã này để tra cứu kết quả sau khi khám.'
+                'message' => 'Đặt lịch thành công! Bạn có thể đăng nhập bằng Số điện thoại của mình (mật khẩu mặc định là SĐT). Mã lịch hẹn: ' . $apt->id
             ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => 'fail', 'errors' => $e->errors(), 'message' => 'Vui lòng kiểm tra lại thông tin.'], 422);
@@ -269,16 +311,19 @@ class ReceptionController extends Controller
     public function getBookedSlots(Request $request)
     {
         $request->validate([
-            'doctor_id' => 'required',
+            'doctor_id' => 'nullable',
             'date'      => 'required|date',
         ]);
         
+        if (!$request->doctor_id) {
+            return response()->json(['booked_times' => []]);
+        }
+
         $bookedTimes = Appointment::where('doctor_id', $request->doctor_id)
             ->whereDate('date', $request->date)
             ->whereIn('status', ['pending', 'inprocess', 'complete'])
             ->pluck('time')
             ->map(function($time) {
-                // Đảm bảo định dạng HH:mm
                 return Carbon::parse($time)->format('H:i');
             });
 
@@ -307,5 +352,13 @@ class ReceptionController extends Controller
         ]);
 
         return response()->json(['status' => 'success', 'message' => 'Cập nhật thông tin bệnh nhân thành công']);
+    }
+
+    /**
+     * Trang quản lý bệnh nhân cho Lễ tân.
+     */
+    public function patients()
+    {
+        return view('reception.patients');
     }
 }

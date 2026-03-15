@@ -41,7 +41,7 @@
                     @csrf
                     
                     <div>
-                        <label for="username" class="block text-xs font-semibold text-gray-600 mb-1 ml-1 uppercase tracking-wider">Tên Đăng Nhập Hoặc Email</label>
+                        <label for="username" class="block text-xs font-semibold text-gray-600 mb-1 ml-1 uppercase tracking-wider">Tên Đăng Nhập / SĐT / Email</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,7 +50,7 @@
                             </div>
                             <input type="text" name="username" id="username" 
                                 class="block w-full pl-10 pr-3 py-2.5 border border-gray-200 rounded-xl leading-5 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500 transition-colors sm:text-sm" 
-                                placeholder="nguyenvana@davicare.com" required autofocus>
+                                placeholder="nguyenvana hoặc 0901234567" required autofocus>
                         </div>
                     </div>
 

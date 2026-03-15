@@ -86,6 +86,7 @@ Route::prefix('reception')->middleware('auth')->group(function () {
     Route::get('/appointments/load',      [\App\Http\Controllers\ReceptionController::class, 'loadAppointments'])->name('reception.appointments.load');
     Route::post('/appointments',          [\App\Http\Controllers\ReceptionController::class, 'storeAppointment'])->name('reception.appointments.store');
     Route::put('/appointments/{appointment}/status', [\App\Http\Controllers\ReceptionController::class, 'updateAppointmentStatus'])->name('reception.appointments.status');
+    Route::get('/patients',               [\App\Http\Controllers\ReceptionController::class, 'patients'])->name('reception.patients');
     Route::post('/patients',              [\App\Http\Controllers\ReceptionController::class, 'storePatient'])->name('reception.patients.store');
     Route::put('/patients/{patient}',     [\App\Http\Controllers\ReceptionController::class, 'updatePatient'])->name('reception.patients.update');
     Route::get('/appointments/{appointment}/invoice', [\App\Http\Controllers\ReceptionController::class, 'getAppointmentInvoice'])->name('reception.appointments.invoice');
@@ -102,4 +103,14 @@ Route::prefix('pharmacy')->middleware('auth')->group(function () {
     Route::get('/inventory/load',          [PharmacyController::class, 'loadInventory'])->name('pharmacy.inventory.load');
     Route::post('/inventory/import',       [PharmacyController::class, 'importStock'])->name('pharmacy.inventory.import');
     Route::get('/transactions',            [PharmacyController::class, 'transactions'])->name('pharmacy.transactions');
+});
+
+
+
+Route::prefix('patient')->middleware('auth')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Patient\PatientDashboardController::class, 'dashboard'])->name('patient.dashboard');
+});
+Route::middleware('auth')->group(function () {
+    Route::get('/change-password', [\App\Http\Controllers\ProfileController::class, 'showChangePassword'])->name('profile.change-password');
+    Route::post('/change-password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.update-password');
 });

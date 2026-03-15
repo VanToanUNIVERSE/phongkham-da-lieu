@@ -9,11 +9,12 @@ class Patient extends Model
 {
     use HasFactory;
     protected $fillable = [
-        "full_name",
-        "gender",
-        "birth_year",
-        "phone",
-        "address"
+        'user_id',
+        'full_name',
+        'phone',
+        'gender',
+        'birth_year',
+        'address'
     ];
     public function appointments() {
         return $this->hasMany(Appointment::class);
@@ -21,5 +22,15 @@ class Patient extends Model
     public function medicalRecords()
     {
         return $this->hasMany(MedicalRecord::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasManyThrough(Invoice::class, MedicalRecord::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

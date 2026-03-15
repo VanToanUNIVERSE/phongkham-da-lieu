@@ -16,26 +16,31 @@ class PublicController extends Controller
     {
         $request->validate([
             'phone' => 'required',
-            'code'  => 'required',
         ], [
-            'phone.required' => 'Vui lòng nhập số điện thoại.',
-            'code.required'  => 'Vui lòng nhập mã lịch hẹn.',
+            'phone.required' => 'Vui lòng nhập số điện thoại để tra cứu.',
         ]);
 
         $phone = $request->phone;
-        $code  = $request->code;
 
-        $appointment = Appointment::with(['patient', 'medicalRecord.prescription.items.medicine'])
-            ->where('id', $code)
-            ->whereHas('patient', function ($q) use ($phone) {
-                $q->where('phone', $phone);
-            })
-            ->first();
+        // Tìm bệnh nhân theo số điện thoại
+        $patient = \App\Models\Patient::where('phone', $phone)->first();
 
-        if (!$appointment) {
-            return back()->with('error', 'Không tìm thấy thông tin lịch hẹn. Vui lòng kiểm tra lại Số điện thoại hoặc Mã lịch hẹn.')->withInput();
+        if (!$patient) {
+            return back()->with('error', 'Không tìm thấy hồ sơ bệnh nhân nào với số điện thoại này.')->withInput();
         }
 
-        return view('public.lookup', compact('appointment'));
+        // Lấy toàn bộ lịch sử khám bệnh (Medical Records) của bệnh nhân này
+        // Bao gồm: bác sĩ, cuộc hẹn, đơn thuốc, chi tiết đơn thuốc, hóa đơn
+        $records = clone $patient->medicalRecords()
+            ->with([
+                'doctor.user',
+                'appointment',
+                'prescription.items.medicine',
+                'invoice'
+            ])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('public.lookup', compact('patient', 'records'));
     }
 }

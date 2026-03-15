@@ -18,5 +18,6 @@ class RolesTableSeeder extends Seeder
         Role::firstOrCreate(['name' => 'Bác sĩ']);
         Role::firstOrCreate(['name' => 'Lễ tân']);
         Role::firstOrCreate(['name' => 'Nhân viên phát thuốc']);
+        Role::firstOrCreate(['name' => 'Bệnh nhân']);
     }
 }

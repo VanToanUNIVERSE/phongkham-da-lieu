@@ -1,4 +1,4 @@
-﻿const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
 const fullName = document.getElementById('full_name');
 const phone = document.getElementById('phone');
@@ -192,6 +192,9 @@ function edit(nid) {
             alert("Lỗi" + e)
         });
 }
+
+
+
 
 function del(nid) {
     showDeleteConfirm(nid, 'mục Bệnh nhân này', '/patients');

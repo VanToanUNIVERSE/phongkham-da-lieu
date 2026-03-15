@@ -3,7 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
 class PatientController extends Controller
@@ -13,7 +16,7 @@ class PatientController extends Controller
      */
     public function index()
     {
-        $patients = Patient::all();
+        $patients = Patient::with('user')->get();
         return view('admin.patient_mg', compact('patients'));
     }
 
@@ -38,10 +41,29 @@ class PatientController extends Controller
                 'birth_year' => 'required',
                 'address' => 'nullable'
             ]);
-            Patient::create($data);
+            $patient = Patient::create($data);
+
+            // Tự động tạo tài khoản nếu có số điện thoại
+            if ($patient->phone) {
+                $existingUser = User::where('username', $patient->phone)->first();
+                if (!$existingUser) {
+                    $rolePatient = Role::where('name', 'Bệnh nhân')->first();
+                    if ($rolePatient) {
+                        $newUser = User::create([
+                            'username' => $patient->phone,
+                            'full_name' => $patient->full_name,
+                            'password' => Hash::make($patient->phone),
+                            'role_id' => $rolePatient->id,
+                        ]);
+                        $patient->update(['user_id' => $newUser->id]);
+                    }
+                } else {
+                    $patient->update(['user_id' => $existingUser->id]);
+                }
+            }
 
             return response()->json([
-                'message' => 'Thêm dữ liệu thành công',
+                'message' => 'Thêm bệnh nhân thành công. Tài khoản đã được tự động tạo (Mật khẩu là SĐT).',
                 'status' => 'success'
             ]);
         }
@@ -117,7 +139,7 @@ class PatientController extends Controller
     }
 
     public function loadData() {
-        $patients = Patient::all();
+        $patients = Patient::with('user')->get();
         return response()->json([
             'patients' => $patients
         ]);

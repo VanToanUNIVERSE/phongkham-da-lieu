@@ -40,6 +40,9 @@ class AuthController extends Controller
             if($role == "Nhân viên phát thuốc" || $role == "Nhân viên phát thuốc") {
                 return redirect("/pharmacy/dashboard");
             }
+            if($role == "Bệnh nhân") {
+                return redirect("/patient/dashboard");
+            }
 
             // Fallback in case of an unknown role or normalization issue
             Auth::logout();
