@@ -145,7 +145,18 @@ class ReceptionController extends Controller
      */
     public function invoices()
     {
-        return view('reception.invoices');
+        // 1. Lấy Doanh thu Tháng này
+        $revenueThisMonth = Invoice::where('status', 'paid')
+            ->whereMonth('created_at', Carbon::now()->month)
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('total_amount');
+
+        // 2. Lấy Doanh thu Năm nay
+        $revenueThisYear = Invoice::where('status', 'paid')
+            ->whereYear('created_at', Carbon::now()->year)
+            ->sum('total_amount');
+
+        return view('reception.invoices', compact('revenueThisMonth', 'revenueThisYear'));
     }
 
     /**
@@ -155,15 +166,39 @@ class ReceptionController extends Controller
     {
         $date = $request->date ?? today()->toDateString();
 
-        $appointments = Appointment::with([
+        $query = Appointment::with([
                 'patient',
                 'doctor.user',
                 'medicalRecord.invoice',
                 'medicalRecord.prescription',
             ])
             ->where('status', 'complete')
-            ->whereDate('date', $date)
-            ->orderBy('time', 'desc')
+            ->whereDate('date', $date);
+
+        // Lọc theo từ khóa (Tên bệnh nhân)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('patient', function($pq) use ($search) {
+                $pq->where('full_name', 'like', "%{$search}%");
+            });
+        }
+
+        // Lọc theo trạng thái hóa đơn
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'none') {
+                $query->whereDoesntHave('medicalRecord.invoice');
+            } elseif ($request->status === 'pending') {
+                $query->whereHas('medicalRecord.invoice', function($iq) {
+                    $iq->where('status', 'pending');
+                });
+            } elseif ($request->status === 'paid') {
+                $query->whereHas('medicalRecord.invoice', function($iq) {
+                    $iq->where('status', 'paid');
+                });
+            }
+        }
+
+        $appointments = $query->orderBy('time', 'desc')
             ->get();
 
         return response()->json(['appointments' => $appointments]);

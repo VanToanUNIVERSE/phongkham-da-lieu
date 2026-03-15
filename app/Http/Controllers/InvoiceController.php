@@ -12,13 +12,55 @@ class InvoiceController extends Controller
     public function index()
     {
         $medical_records = MedicalRecord::with(['patient', 'prescription'])->orderBy('id', 'desc')->get();
-        return view('admin.invoice_mg', compact('medical_records'));
+
+        // 1. Lấy Doanh thu Tháng này
+        $revenueThisMonth = Invoice::where('status', 'paid')
+            ->whereMonth('created_at', \Carbon\Carbon::now()->month)
+            ->whereYear('created_at', \Carbon\Carbon::now()->year)
+            ->sum('total_amount');
+
+        // 2. Lấy Doanh thu Năm nay
+        $revenueThisYear = Invoice::where('status', 'paid')
+            ->whereYear('created_at', \Carbon\Carbon::now()->year)
+            ->sum('total_amount');
+
+        return view('admin.invoice_mg', compact('medical_records', 'revenueThisMonth', 'revenueThisYear'));
     }
 
     public function loadData(Request $request)
     {
-        $invoices = Invoice::with(['patient', 'medical_record.prescription'])
-            ->orderBy('id', 'desc')
+        $query = Invoice::with(['patient', 'medical_record.prescription']);
+
+        // Lọc theo từ khóa (Tên bệnh nhân hoặc Mã hóa đơn)
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('id', 'like', "%{$search}%")
+                  ->orWhereHas('patient', function($pq) use ($search) {
+                      $pq->where('full_name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Lọc theo trạng thái
+        if ($request->filled('status') && $request->status !== 'all') {
+            $query->where('status', $request->status);
+        }
+
+        // Lọc theo phương thức thanh toán
+        if ($request->filled('payment_method') && $request->payment_method !== 'all') {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // Lọc theo ngày
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        $invoices = $query->orderBy('id', 'desc')
             ->get()
             ->map(function ($invoice) {
                 return [

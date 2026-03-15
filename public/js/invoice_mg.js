@@ -1,9 +1,44 @@
 document.addEventListener("DOMContentLoaded", function () {
     loadData();
+
+    // Event listeners for filters
+    const filterSearch = document.getElementById('filterSearch');
+    const filterStatus = document.getElementById('filterStatus');
+    const filterPaymentMethod = document.getElementById('filterPaymentMethod');
+    const filterDateFrom = document.getElementById('filterDateFrom');
+    const filterDateTo = document.getElementById('filterDateTo');
+
+    if (filterSearch) {
+        filterSearch.addEventListener('input', debounce(() => loadData(), 500));
+    }
+    [filterStatus, filterPaymentMethod, filterDateFrom, filterDateTo].forEach(el => {
+        if (el) el.addEventListener('change', () => loadData());
+    });
 });
 
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 function loadData() {
-    fetch('/invoices/loadData')
+    // Collect filter values
+    const params = new URLSearchParams({
+        search: document.getElementById('filterSearch')?.value || '',
+        status: document.getElementById('filterStatus')?.value || 'all',
+        payment_method: document.getElementById('filterPaymentMethod')?.value || 'all',
+        date_from: document.getElementById('filterDateFrom')?.value || '',
+        date_to: document.getElementById('filterDateTo')?.value || ''
+    });
+
+    fetch(`/invoices/loadData?${params.toString()}`)
         .then(res => res.json())
         .then(data => {
             let html = "";

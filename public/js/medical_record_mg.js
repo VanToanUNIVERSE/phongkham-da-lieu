@@ -65,36 +65,50 @@ function loadData() {
     .then(res => res.json())
     .then(data => {
         let html = `
-            <thead class="bg-gray-50 border-b border-gray-200 text-sm md:text-base text-gray-600 tracking-wider">
+            <thead class="bg-slate-50 border-b border-slate-200 text-xs text-slate-500 uppercase tracking-widest font-black">
                 <tr>
-                    <th class="py-4 px-6 font-semibold w-24">Mã Hồ Sơ Khám</th>
-                    <th class="py-4 px-6 font-semibold">Bác sĩ chủ trị</th>
-                    <th class="py-4 px-6 font-semibold">Tên bệnh nhân</th>
-                    <th class="py-4 px-6 font-semibold">Chẩn đoán</th>
-                    <th class="py-4 px-6 font-semibold">Kết quả khám</th>
-                    <th class="py-4 px-6 font-semibold text-right">Thao tác</th>
+                    <th class="py-4 px-6 w-24">Mã Hồ Sơ</th>
+                    <th class="py-4 px-6">Bác sĩ chủ trị</th>
+                    <th class="py-4 px-6">Tên bệnh nhân</th>
+                    <th class="py-4 px-6 w-1/4">Chẩn đoán</th>
+                    <th class="py-4 px-6 w-1/4">Kết quả khám</th>
+                    <th class="py-4 px-6 text-right">Thao tác</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100 text-gray-700">
+            <tbody class="divide-y divide-slate-100 text-slate-600 bg-white">
         `;
 
         data.medical_records.forEach(m => {
             html += `
-            <tr id="row-${m.id}" class="hover:bg-gray-50/50 transition-colors">
-                <td class="py-3 px-6 font-medium text-gray-900">
-                    <span class="inline-flex items-center text-blue-700 bg-blue-50 px-2.5 py-1 rounded-md text-xs font-semibold border border-blue-100">#${m.id}</span>
+            <tr id="row-${m.id}" class="hover:bg-slate-50 transition-colors group">
+                <td class="py-4 px-6">
+                    <span class="inline-flex items-center text-slate-700 bg-slate-100 px-2.5 py-1 rounded-md text-xs font-black tracking-wide">#${m.id}</span>
                 </td>
-                <td class="py-3 px-6 font-medium text-blue-600">BS. ${m.doctor.user.full_name ?? ''}</td>
-                <td class="py-3 px-6 font-medium text-gray-800">${m.patient.full_name ?? ''}</td>
-                <td class="py-3 px-6 text-sm text-gray-600">${m.diagnosis ? m.diagnosis.substring(0,30) + (m.diagnosis.length > 30 ? '...' : '') : '<em class="text-gray-400">Trống</em>'}</td>
-                <td class="py-3 px-6 text-sm text-green-700 font-medium">${m.examination_result ? m.examination_result.substring(0,30) + (m.examination_result.length > 30 ? '...' : '')  : '<em class="text-gray-400">Trống</em>'}</td>
-                <td class="py-3 px-6 text-right">
+                <td class="py-4 px-6">
+                    <div class="font-bold text-slate-800 flex items-center gap-2">
+                        <div class="h-8 w-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black text-xs shadow-sm border border-slate-200">
+                            ${m.doctor?.user?.full_name ? m.doctor.user.full_name.substring(0, 1) : '?'}
+                        </div>
+                        BS. ${m.doctor?.user?.full_name ?? ''}
+                    </div>
+                </td>
+                <td class="py-4 px-6">
+                    <div class="font-bold text-slate-800 flex items-center gap-2">
+                        <div class="h-8 w-8 rounded-full bg-slate-100 text-slate-600 flex items-center justify-center font-black text-xs shadow-sm border border-slate-200">
+                            ${m.patient?.full_name ? m.patient.full_name.substring(0, 1) : '?'}
+                        </div>
+                        ${m.patient?.full_name ?? ''}
+                    </div>
+                </td>
+                <td class="py-4 px-6 text-sm text-slate-600 leading-relaxed font-medium">${m.diagnosis ? m.diagnosis.substring(0,30) + (m.diagnosis.length > 30 ? '...' : '') : '<em class="text-slate-400 font-normal">Trống</em>'}</td>
+                <td class="py-4 px-6 text-sm text-emerald-700 font-medium bg-emerald-50/30">${m.examination_result ? m.examination_result.substring(0,30) + (m.examination_result.length > 30 ? '...' : '')  : '<em class="text-slate-400 font-normal">Trống</em>'}</td>
+                <td class="py-4 px-6 text-right">
                     <div class="flex justify-end gap-2">
-                        <button onclick="edit(${m.id})" class="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Xem / Sửa">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                        <button onclick="edit(${m.id})" class="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm active:scale-95" title="Xem / Sửa">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                         </button>
-                        <button onclick="del(${m.id})" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Xóa">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        <button onclick="del(${m.id})" class="p-2 text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white rounded-xl transition-all shadow-sm active:scale-95" title="Xóa">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </div>
                 </td>
