@@ -98,19 +98,19 @@
 
                         <div>
                             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Đơn thuốc của bạn</h3>
-                            @if($appointment->medicalRecord && $appointment->medicalRecord->prescriptions->count() > 0)
+                            @if($appointment->medicalRecord && $appointment->medicalRecord->prescription && $appointment->medicalRecord->prescription->items->count() > 0)
                                 <div class="space-y-3">
-                                    @foreach($appointment->medicalRecord->prescriptions as $pres)
+                                    @foreach($appointment->medicalRecord->prescription->items as $item)
                                         <div class="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-blue-200 transition-colors">
                                             <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
                                                 {{ $loop->iteration }}
                                             </div>
                                             <div class="flex-1">
-                                                <p class="font-bold text-gray-800">{{ $pres->medicine->name }}</p>
-                                                <p class="text-xs text-gray-500">{{ $pres->dosage }} / {{ $pres->frequency }} ({{ $pres->duration }})</p>
+                                                <p class="font-bold text-gray-800">{{ $item->medicine->name }}</p>
+                                                <p class="text-xs text-gray-500">{{ $item->dosage }} / {{ $item->usage }}</p>
                                             </div>
                                             <div class="text-right font-bold text-gray-400">
-                                                x{{ $pres->quantity }}
+                                                x{{ $item->quantity }}
                                             </div>
                                         </div>
                                     @endforeach

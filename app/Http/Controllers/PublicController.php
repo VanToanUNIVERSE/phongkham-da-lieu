@@ -25,7 +25,7 @@ class PublicController extends Controller
         $phone = $request->phone;
         $code  = $request->code;
 
-        $appointment = Appointment::with(['patient', 'medicalRecord.prescriptions.medicine'])
+        $appointment = Appointment::with(['patient', 'medicalRecord.prescription.items.medicine'])
             ->where('id', $code)
             ->whereHas('patient', function ($q) use ($phone) {
                 $q->where('phone', $phone);

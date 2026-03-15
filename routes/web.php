@@ -37,6 +37,10 @@ Route::get('/', function () {
     return view('welcome', compact('doctors'));
 })->name('home');
 Route::post('/dat-lich', [ReceptionController::class, 'publicBooking'])->name('public.booking');
+Route::get('/invoices', [InvoiceController::class, 'index'])->name('invoices.index');
+Route::get('/invoices/{id}/export-txt', [InvoiceController::class, 'exportTxt'])->name('invoices.export-txt');
+Route::get('/invoices/{id}/print', [InvoiceController::class, 'print'])->name('invoices.print');
+Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.store');
 Route::get('/tra-cuu', [PublicController::class, 'showLookupForm'])->name('public.lookup');
 Route::post('/tra-cuu', [PublicController::class, 'search'])->name('public.lookup.search');
 

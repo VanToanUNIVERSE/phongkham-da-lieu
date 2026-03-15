@@ -133,4 +133,71 @@ class InvoiceController extends Controller
 
         return response()->json(['status' => 'success']);
     }
+
+    public function exportTxt($id)
+    {
+        $invoice = Invoice::with(['patient', 'medical_record.appointment.doctor.user', 'medical_record.prescription.items.medicine'])->findOrFail($id);
+        
+        $patient = $invoice->patient;
+        $record = $invoice->medical_record;
+        $apt = $record->appointment;
+        $doctorName = $apt->doctor->user->full_name ?? 'N/A';
+        
+        $content = "HÓA ĐƠN THANH TOÁN\n";
+        $content .= "Phòng Khám Da Liễu Cao Cấp\n";
+        $content .= "------------------------------------------\n";
+        $content .= "Mã hóa đơn: #{$invoice->id}\n";
+        $content .= "Ngày lập: " . $invoice->created_at->format('d/m/Y H:i') . "\n";
+        $content .= "------------------------------------------\n";
+        $content .= "THÔNG TIN BỆNH NHÂN\n";
+        $content .= "Họ tên: {$patient->full_name}\n";
+        $content .= "SĐT: {$patient->phone}\n";
+        $content .= "Năm sinh: {$patient->birth_year}\n";
+        $content .= "Giới tính: " . ($patient->gender == 1 ? 'Nam' : 'Nữ') . "\n";
+        $content .= "Địa chỉ: {$patient->address}\n";
+        $content .= "------------------------------------------\n";
+        $content .= "CHI TIẾT DỊCH VỤ\n";
+        $content .= "Bác sĩ khám: BS. {$doctorName}\n";
+        $content .= "------------------------------------------\n";
+        $content .= "KẾT QUẢ KHÁM BỆNH\n";
+        $content .= "Chẩn đoán: " . ($record->diagnosis ?? 'Đang cập nhật...') . "\n";
+        if ($record->examination_results) {
+            $content .= "Kết quả lâm sàng:\n" . wordwrap($record->examination_results, 40, "\n") . "\n";
+        }
+        $content .= "------------------------------------------\n";
+        $content .= "CHI PHÍ THANH TOÁN\n";
+        $content .= "Phí khám lâm sàng: " . number_format($invoice->examination_fee, 0, ',', '.') . " VNĐ\n";
+        
+        if ($invoice->medicine_fee > 0) {
+            $content .= "Tiền thuốc: " . number_format($invoice->medicine_fee, 0, ',', '.') . " VNĐ\n";
+            $content .= "Chi tiết đơn thuốc:\n";
+            if ($record->prescription && $record->prescription->items) {
+                foreach ($record->prescription->items as $item) {
+                    $content .= "  - {$item->medicine->name}: {$item->quantity} ({$item->dosage})\n";
+                }
+            }
+        }
+        
+        $content .= "------------------------------------------\n";
+        $content .= "TỔNG THANH TOÁN: " . number_format($invoice->total_amount, 0, ',', '.') . " VNĐ\n";
+        $content .= "Phương thức: " . ($invoice->payment_method == 'cash' ? 'Tiền mặt' : ($invoice->payment_method == 'bank_transfer' ? 'Chuyển khoản' : 'Thẻ/Ví')) . "\n";
+        $content .= "Trạng thái: " . ($invoice->status == 'paid' ? 'Đã thanh toán' : 'Chờ thanh toán') . "\n";
+        $content .= "------------------------------------------\n";
+        $content .= "Cảm ơn quý khách đã tin tưởng!\n";
+        $content .= "Hẹn gặp lại quý khách.\n";
+
+        $fileName = "HoaDon_" . $invoice->id . "_" . date('Ymd_His') . ".txt";
+        
+        return response($content)
+            ->withHeaders([
+                'Content-Type' => 'text/plain',
+                'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
+            ]);
+    }
+
+    public function print($id)
+    {
+        $invoice = Invoice::with(['patient', 'medical_record.appointment.doctor.user', 'medical_record.prescription.items.medicine'])->findOrFail($id);
+        return view('reception.print', compact('invoice'));
+    }
 }

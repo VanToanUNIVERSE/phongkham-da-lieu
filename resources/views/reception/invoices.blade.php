@@ -76,6 +76,16 @@
                 <div id="paidBlock" class="hidden text-center py-4 bg-emerald-50 text-emerald-700 rounded-xl font-bold">
                     ✓ Hóa đơn đã được thanh toán
                 </div>
+                
+                <a id="exportTxtBtn" href="#" class="w-full mt-4 py-3 border-2 border-dashed border-gray-200 text-gray-400 hover:border-blue-400 hover:text-blue-500 rounded-xl font-bold flex items-center justify-center gap-2 transition-all">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    XUẤT FILE TXT
+                </a>
+
+                <a id="printInvBtn" href="#" target="_blank" class="w-full mt-2 py-3 bg-gray-900 text-white hover:bg-black rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg active:scale-95">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    IN HÓA ĐƠN & KẾT QUẢ
+                </a>
             </div>
 
             {{-- === BLOCK B: No invoice yet, but medical record exists — create form === --}}
@@ -293,6 +303,10 @@ function openPanel(aptId) {
 
             document.getElementById('confirmPayBlock').classList.toggle('hidden', isPaid);
             document.getElementById('paidBlock').classList.toggle('hidden', !isPaid);
+            
+            // Set export & print links
+            document.getElementById('exportTxtBtn').href = `/invoices/${invoice.id}/export-txt`;
+            document.getElementById('printInvBtn').href = `/invoices/${invoice.id}/print`;
         } else if (record) {
             // No invoice yet, but has medical record — show create form
             document.getElementById('blockCreate').classList.remove('hidden');
