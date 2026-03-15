@@ -21,9 +21,18 @@
         {{-- Content --}}
         <div class="flex-1 overflow-y-auto p-6 space-y-5">
 
+            {{-- Patient Info --}}
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-sm space-y-2">
+                <p class="font-bold text-blue-700 mb-2 uppercase tracking-widest text-xs">Thông tin bệnh nhân</p>
+                <div class="flex justify-between"><span class="text-blue-500">Số điện thoại</span><span id="ptPhone" class="font-semibold text-gray-800">—</span></div>
+                <div class="flex justify-between"><span class="text-blue-500">Giới tính</span><span id="ptGender" class="font-semibold text-gray-800">—</span></div>
+                <div class="flex justify-between"><span class="text-blue-500">Năm sinh</span><span id="ptBirth" class="font-semibold text-gray-800">—</span></div>
+                <div class="flex justify-between"><span class="text-blue-500">Địa chỉ</span><span id="ptAddress" class="font-semibold text-gray-800 text-right">—</span></div>
+            </div>
+
             {{-- Appointment Info --}}
             <div class="bg-gray-50 border border-gray-100 rounded-xl p-4 text-sm space-y-1.5">
-                <p class="font-bold text-gray-700 mb-2 uppercase tracking-widest text-xs">Ca khám</p>
+                <p class="font-bold text-gray-700 mb-2 uppercase tracking-widest text-xs">Chi tiết ca khám</p>
                 <div class="flex justify-between"><span class="text-gray-500">Bác sĩ</span><span id="aptDoctor" class="font-semibold text-gray-800">—</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">Giờ khám</span><span id="aptTime" class="font-semibold text-gray-800">—</span></div>
                 <div class="flex justify-between"><span class="text-gray-500">Ngày</span><span id="aptDate" class="font-semibold text-gray-800">—</span></div>
@@ -253,6 +262,16 @@ function openPanel(aptId) {
 
         document.getElementById('panelPatientName').innerText = cachedPt;
         document.getElementById('panelSubtitle').innerText = `Lịch #${aptId} — ${cachedDate}`;
+        
+        // Populate Patient Details
+        const patient = record ? record.patient : cached.patient;
+        if (patient) {
+            document.getElementById('ptPhone').innerText   = patient.phone || '—';
+            document.getElementById('ptGender').innerText  = patient.gender == 1 ? 'Nam' : (patient.gender == 0 ? 'Nữ' : '—');
+            document.getElementById('ptBirth').innerText   = patient.birth_year || '—';
+            document.getElementById('ptAddress').innerText = patient.address || '—';
+        }
+
         document.getElementById('aptDoctor').innerText = record && record.doctor ? record.doctor.user.full_name : cachedDr;
         document.getElementById('aptTime').innerText = cachedTime;
         document.getElementById('aptDate').innerText = cachedDate;

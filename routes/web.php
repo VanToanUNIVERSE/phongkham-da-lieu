@@ -11,6 +11,7 @@ use App\Http\Controllers\PharmacyController;
 use App\Http\Controllers\PrescriptionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReceptionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Auth\User;
@@ -36,7 +37,10 @@ Route::get('/', function () {
     return view('welcome', compact('doctors'));
 })->name('home');
 Route::post('/dat-lich', [ReceptionController::class, 'publicBooking'])->name('public.booking');
+Route::get('/tra-cuu', [PublicController::class, 'showLookupForm'])->name('public.lookup');
+Route::post('/tra-cuu', [PublicController::class, 'search'])->name('public.lookup.search');
 
+Route::get('/booked-slots', [\App\Http\Controllers\ReceptionController::class, 'getBookedSlots'])->name('booked.slots');
 Route::get("/login", [AuthController::class, 'showLogin'])->name("login");
 Route::post("/login", [AuthController::class, "login"])->name("postLogin");
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
@@ -79,6 +83,7 @@ Route::prefix('reception')->middleware('auth')->group(function () {
     Route::post('/appointments',          [\App\Http\Controllers\ReceptionController::class, 'storeAppointment'])->name('reception.appointments.store');
     Route::put('/appointments/{appointment}/status', [\App\Http\Controllers\ReceptionController::class, 'updateAppointmentStatus'])->name('reception.appointments.status');
     Route::post('/patients',              [\App\Http\Controllers\ReceptionController::class, 'storePatient'])->name('reception.patients.store');
+    Route::put('/patients/{patient}',     [\App\Http\Controllers\ReceptionController::class, 'updatePatient'])->name('reception.patients.update');
     Route::get('/appointments/{appointment}/invoice', [\App\Http\Controllers\ReceptionController::class, 'getAppointmentInvoice'])->name('reception.appointments.invoice');
     Route::get('/invoices',               [\App\Http\Controllers\ReceptionController::class, 'invoices'])->name('reception.invoices');
     Route::get('/invoices/load',          [\App\Http\Controllers\ReceptionController::class, 'loadInvoices'])->name('reception.invoices.load');

@@ -96,11 +96,11 @@
                     location.reload(); 
                 }
             } else {
-                alert("Lỗi: " + (data.message || 'Không thể xóa'));
+                showToast(data.message || 'Không thể xóa', 'error');
             }
         })
         .catch(e => {
-            alert("Lỗi kết nối khi xoá");
+            showToast('Lỗi kết nối khi xoá', 'error');
             console.error(e);
         })
         .finally(() => {

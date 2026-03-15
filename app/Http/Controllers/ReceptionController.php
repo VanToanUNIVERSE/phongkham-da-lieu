@@ -87,7 +87,9 @@ class ReceptionController extends Controller
      */
     public function updateAppointmentStatus(Request $request, Appointment $appointment)
     {
-        $request->validate(['status' => 'required|in:pending,inprocess,complete']);
+        $request->validate([
+            'status' => 'required|in:unconfirmed,pending,inprocess,complete,cancel',
+        ]);
         $appointment->update(['status' => $request->status]);
         return response()->json(['status' => 'success', 'message' => 'Cập nhật trạng thái thành công']);
     }
@@ -207,19 +209,68 @@ class ReceptionController extends Controller
                 return response()->json(['status' => 'fail', 'message' => 'Hiện chưa có bác sĩ nào trong hệ thống.'], 422);
             }
 
-            Appointment::create([
+            $apt = Appointment::create([
                 'patient_id' => $patient->id,
                 'doctor_id'  => $doctorId,
                 'date'       => $request->date,
                 'time'       => $request->time,
-                'status'     => 'pending',
+                'status'     => 'unconfirmed',
             ]);
 
-            return response()->json(['status' => 'success', 'message' => 'Đặt lịch thành công! Phòng khám sẽ liên hệ xác nhận sớm nhất.']);
+            return response()->json([
+                'status' => 'success', 
+                'message' => 'Đặt lịch thành công! Mã lịch hẹn của bạn là: ' . $apt->id . '. Vui lòng lưu lại mã này để tra cứu kết quả sau khi khám.'
+            ]);
         } catch (ValidationException $e) {
             return response()->json(['status' => 'fail', 'errors' => $e->errors(), 'message' => 'Vui lòng kiểm tra lại thông tin.'], 422);
         } catch (\Exception $e) {
             return response()->json(['status' => 'fail', 'message' => 'Có lỗi xảy ra, vui lòng thử lại.'], 500);
         }
+    }
+
+    /**
+     * API: Lấy các khung giờ đã được đặt của một bác sĩ trong một ngày.
+     */
+    public function getBookedSlots(Request $request)
+    {
+        $request->validate([
+            'doctor_id' => 'required',
+            'date'      => 'required|date',
+        ]);
+        
+        $bookedTimes = Appointment::where('doctor_id', $request->doctor_id)
+            ->whereDate('date', $request->date)
+            ->whereIn('status', ['pending', 'inprocess', 'complete'])
+            ->pluck('time')
+            ->map(function($time) {
+                // Đảm bảo định dạng HH:mm
+                return Carbon::parse($time)->format('H:i');
+            });
+
+        return response()->json(['booked_times' => $bookedTimes]);
+    }
+
+    /**
+     * Cập nhật thông tin bệnh nhân.
+     */
+    public function updatePatient(Request $request, Patient $patient)
+    {
+        $request->validate([
+            'full_name'  => 'required|string|max:255',
+            'phone'       => 'nullable|string|max:20',
+            'birth_year'  => 'nullable|integer|min:1900|max:' . date('Y'),
+            'gender'      => 'nullable|in:0,1',
+            'address'     => 'nullable|string|max:255',
+        ]);
+
+        $patient->update([
+            'full_name'  => $request->full_name,
+            'phone'       => $request->phone,
+            'birth_year'  => $request->birth_year,
+            'gender'      => $request->gender,
+            'address'     => $request->address,
+        ]);
+
+        return response()->json(['status' => 'success', 'message' => 'Cập nhật thông tin bệnh nhân thành công']);
     }
 }

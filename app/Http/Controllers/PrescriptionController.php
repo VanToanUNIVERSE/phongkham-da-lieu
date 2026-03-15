@@ -57,40 +57,17 @@ class PrescriptionController extends Controller
 
             $prescription = Prescription::create([
                 'medical_record_id' => $data['medical_record_id'],
-                'dispensed_by' => $data['dispensed_by'],
+                'dispensed_by' => null, // Sẽ được cập nhật khi Dược sĩ phát thuốc
                 'content' => $data['content'],
-                'dispense_status' => $data['dispense_status'],
+                'dispense_status' => 'pending',
             ]);
-
             foreach ($data['items'] as $item) {
-
-                $medicine = Medicine::find($item['medicine_id']);
-
-                // 🔥 kiểm tra tồn kho
-                if ($medicine->stock < $item['quantity']) {
-                    throw ValidationException::withMessages([
-                        'stock' => 'Thuốc ' . $medicine->name . ' không đủ tồn kho'
-                    ]);
-                }
-
                 PrescriptionItem::create([
                     'prescription_id' => $prescription->id,
                     'medicine_id' => $item['medicine_id'],
                     'quantity' => $item['quantity'],
                     'dosage' => $item['dosage'] ?? null,
                     'usage' => $item['usage'] ?? null,
-                ]);
-
-                // trừ kho
-                $medicine->decrement('stock', $item['quantity']);
-
-                // tạo transaction
-                MedicineTransaction::create([
-                    'medicine_id' => $medicine->id,
-                    'type' => 'export',
-                    'quantity' => $item['quantity'],
-                    'note' => 'Phát thuốc theo đơn #' . $prescription->id,
-                    'user_id' => $data['dispensed_by'],
                 ]);
             }
 
@@ -169,51 +146,23 @@ class PrescriptionController extends Controller
 
             $prescription = Prescription::with('items')->findOrFail($id);
 
-            // 🔥 Hoàn lại stock từ item cũ
-            foreach ($prescription->items as $oldItem) {
-
-                $medicine = Medicine::find($oldItem->medicine_id);
-                $medicine->increment('stock', $oldItem->quantity);
-            }
-
             // Xóa items cũ
             $prescription->items()->delete();
 
             // Update header
             $prescription->update([
                 'medical_record_id' => $data['medical_record_id'],
-                'dispensed_by' => $data['dispensed_by'],
                 'content' => $data['content'],
-                'dispense_status' => $data['dispense_status'],
             ]);
 
             // Thêm items mới
             foreach ($data['items'] as $item) {
-
-                $medicine = Medicine::find($item['medicine_id']);
-
-                if ($medicine->stock < $item['quantity']) {
-                    throw ValidationException::withMessages([
-                        'stock' => 'Thuốc ' . $medicine->name . ' không đủ tồn kho'
-                    ]);
-                }
-
                 PrescriptionItem::create([
                     'prescription_id' => $prescription->id,
                     'medicine_id' => $item['medicine_id'],
                     'quantity' => $item['quantity'],
                     'dosage' => $item['dosage'] ?? null,
                     'usage' => $item['usage'] ?? null,
-                ]);
-
-                $medicine->decrement('stock', $item['quantity']);
-
-                MedicineTransaction::create([
-                    'medicine_id' => $medicine->id,
-                    'type' => 'export',
-                    'quantity' => $item['quantity'],
-                    'note' => 'Cập nhật đơn #' . $prescription->id,
-                    'user_id' => $data['dispensed_by'],
                 ]);
             }
 

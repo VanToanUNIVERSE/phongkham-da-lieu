@@ -110,6 +110,19 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                             Kê đơn thuốc
                         </button>
+                        
+                        <div class="relative flex py-4 items-center">
+                            <div class="flex-grow border-t border-gray-200"></div>
+                            <span class="flex-shrink mx-4 text-gray-400 text-[10px] font-bold uppercase tracking-widest">Hoặc</span>
+                            <div class="flex-grow border-t border-gray-200"></div>
+                        </div>
+
+                        <button onclick="finishWithoutPrescription()"
+                            class="w-full py-2.5 bg-white border-2 border-teal-600 text-teal-600 hover:bg-teal-50 font-bold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Hoàn thành & Không kê đơn
+                        </button>
+
                         <p id="prescMsg" class="text-center text-sm mt-2 font-medium"></p>
                     </div>
                 </div>
@@ -297,9 +310,19 @@ function openPanel(aptId, patientName, date, time, patientId, status) {
     }, 10);
 
     // Load medical record for this appointment
-    loadRecord(aptId, patientId);
+    loadRecord(aptId, patientId, status);
     // Load patient history
     loadHistory(patientId);
+
+    // 🔥 Tự động chuyển trạng thái sang "Đang khám" nếu đang là "Chờ khám"
+    if (status === 'pending') {
+        updateAptStatus(aptId, 'inprocess');
+    }
+
+    // Nếu đã hoàn thành thì ẩn các nút thao tác chính
+    const isComplete = (status === 'complete');
+    document.getElementById('saveRecordBtn').classList.toggle('hidden', isComplete);
+    document.getElementById('recordForm').classList.toggle('hidden', isComplete && !!currentRecordId);
 }
 
 function closePanel() {
@@ -320,8 +343,35 @@ function refreshStatusBadge(current) {
     };
     const s = cfg[current] || { bg: 'bg-gray-50', text: 'text-gray-600', border: 'border-gray-200', label: current };
     const badge = document.getElementById('statusBadge');
-    badge.innerText = s.label;
-    badge.className = `px-3 py-1 rounded-full text-xs font-semibold border transition-all ${s.bg} ${s.text} ${s.border}`;
+    if (badge) {
+        badge.innerText = s.label;
+        badge.className = `px-3 py-1 rounded-full text-xs font-semibold border transition-all ${s.bg} ${s.text} ${s.border}`;
+    }
+}
+
+function updateAptStatus(aptId, newStatus) {
+    fetch(`/doctor/appointments/${aptId}/status`, {
+        method: 'PUT',
+        headers: {
+            'X-CSRF-TOKEN': token,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.status === 'success') {
+            // Cập nhật ngầm trong allAppointments để không cần load lại toàn bộ
+            const apt = allAppointments.find(a => a.id == aptId);
+            if (apt) {
+                apt.status = newStatus;
+                renderAppointments();
+                refreshStatusBadge(newStatus);
+            }
+        }
+    })
+    .catch(e => console.error('Lỗi cập nhật trạng thái:', e));
 }
 
 // =========================================================
@@ -355,7 +405,9 @@ function resetRecordForm() {
     document.getElementById('saveRecordBtn').innerText = 'Lưu hồ sơ khám';
 }
 
-function loadRecord(aptId, patientId) {
+function loadRecord(aptId, patientId, status) {
+    const isComplete = (status === 'complete');
+    
     // Tải toàn bộ hồ sơ của bác sĩ, lọc theo appointment_id
     fetch('{{ route("doctor.medical_records.load") }}')
     .then(r => r.json())
@@ -366,14 +418,29 @@ function loadRecord(aptId, patientId) {
             document.getElementById('existingDiagnosis').innerText = rec.diagnosis;
             document.getElementById('existingResult').innerText = rec.examination_result;
             document.getElementById('existingRecord').classList.remove('hidden');
+            
+            // Ẩn nút sửa nếu đã hoàn thành
+            const editBtn = document.querySelector('#existingRecord button');
+            if (editBtn) editBtn.classList.toggle('hidden', isComplete);
+
             document.getElementById('diagnosis').value = rec.diagnosis;
             document.getElementById('examinationResult').value = rec.examination_result;
             document.getElementById('saveRecordBtn').innerText = 'Cập nhật hồ sơ';
+            
+            // Nếu đã hoàn thành thì không hiện form nữa
+            if (isComplete) {
+                document.getElementById('recordForm').classList.add('hidden');
+            }
+
             // Show prescription section
-            showPrescSection(rec.id);
+            showPrescSection(rec.id, status);
         } else {
-            document.getElementById('noPrescNote').classList.remove('hidden');
+            document.getElementById('noPrescNote').classList.toggle('hidden', isComplete);
             document.getElementById('prescSection').classList.add('hidden');
+            
+            if (isComplete) {
+                document.getElementById('recordForm').innerHTML = '<div class="text-center py-10 text-gray-400">Không tìm thấy hồ sơ khám cho ca này.</div>';
+            }
         }
     })
     .catch(e => console.error(e));
@@ -427,9 +494,13 @@ function saveRecord() {
 // =========================================================
 // PRESCRIPTIONS
 // =========================================================
-function showPrescSection(recordId) {
+function showPrescSection(recordId, status) {
+    const isComplete = (status === 'complete');
     document.getElementById('noPrescNote').classList.add('hidden');
     document.getElementById('prescSection').classList.remove('hidden');
+    
+    // Ẩn form kê đơn nếu đã hoàn thành
+    document.getElementById('prescForm').classList.toggle('hidden', isComplete);
 
     // Load existing prescriptions for this record
     fetch('{{ route("doctor.prescriptions.load") }}')
@@ -549,6 +620,14 @@ function savePrescription() {
         }
     })
     .catch(e => console.error(e));
+}
+
+function finishWithoutPrescription() {
+    showConfirm("Bạn xác nhận hoàn thành ca khám này mà không kê đơn thuốc?", () => {
+        updateAptStatus(currentAptId, 'complete');
+        showToast("Đã hoàn thành ca khám", "success");
+        setTimeout(closePanel, 1000);
+    });
 }
 
 // =========================================================

@@ -6,8 +6,6 @@ use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
 
 class UserController extends Controller
 {
@@ -41,16 +39,7 @@ class UserController extends Controller
             'phone' => 'nullable',
             'status' => 'required',
             'role_id' => 'required|exists:roles,id',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
-        
-        $avatarPath = null;
-        if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/avatars'), $filename);
-            $avatarPath = 'uploads/avatars/' . $filename;
-        }
+            ]);
 
         $user = User::create([
             'username'   => $request->username,
@@ -61,7 +50,6 @@ class UserController extends Controller
             'phone'      => $request->phone,
             'status'     => $request->status,
             'role_id'    => $request->role_id,
-            'avatar'     => $avatarPath,
             ]);
 
         if ($request->role_id == 2) {
@@ -102,8 +90,7 @@ class UserController extends Controller
             'full_name'  => 'required',
             'gender'     => 'required',
             'status'     => 'required',
-            'role_id'    => 'required|exists:roles,id',
-            'avatar'     => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'role_id'    => 'required|exists:roles,id'
         ]);
 
         $data = [
@@ -115,18 +102,6 @@ class UserController extends Controller
             'status'     => $request->status,
             'role_id'    => $request->role_id,
         ];
-
-        if ($request->hasFile('avatar')) {
-            // Xoá avatar cũ nếu có
-            if ($user->avatar && File::exists(public_path($user->avatar))) {
-                File::delete(public_path($user->avatar));
-            }
-
-            $file = $request->file('avatar');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads/avatars'), $filename);
-            $data['avatar'] = 'uploads/avatars/' . $filename;
-        }
 
         // nếu nhập password mới thì đổi
         if ($request->filled('password')) {
@@ -174,11 +149,6 @@ class UserController extends Controller
             // Nếu là bác sĩ thì xóa record trong bảng doctors trước
             if ($user->doctor) {
                 $user->doctor->delete();
-            }
-
-            // Xoá avatar nếu có
-            if ($user->avatar && File::exists(public_path($user->avatar))) {
-                File::delete(public_path($user->avatar));
             }
             
             $user->delete();

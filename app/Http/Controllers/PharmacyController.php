@@ -84,6 +84,11 @@ class PharmacyController extends Controller
             foreach ($prescription->items as $item) {
                 $medicine = $item->medicine;
 
+                // Double check stock before decrementing
+                if ($medicine->stock < $item->quantity) {
+                    throw new \Exception("Thuốc {$medicine->name} không đủ tồn kho để phát.");
+                }
+
                 // Deduct stock
                 $medicine->decrement('stock', $item->quantity);
 

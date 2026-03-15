@@ -30,13 +30,51 @@
 
             {{-- TAB: THÔNG TIN BỆNH NHÂN --}}
             <div id="tab-content-info" class="p-6">
-                <div id="patientInfoBox" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 text-sm space-y-1.5">
+                <div id="patientInfoView" class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-4 text-sm relative group/info">
+                    <button onclick="toggleEditPatient('edit')" class="absolute top-3 right-3 p-1.5 rounded-lg bg-blue-100 text-blue-600 opacity-0 group-hover/info:opacity-100 transition-opacity hover:bg-blue-200" title="Chỉnh sửa thông tin">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                    </button>
                     <p><span class="font-semibold text-gray-600 w-24 inline-block">Họ tên:</span> <span id="ptName" class="text-gray-800">—</span></p>
                     <p><span class="font-semibold text-gray-600 w-24 inline-block">Năm sinh:</span> <span id="ptBirthYear" class="text-gray-800">—</span></p>
                     <p><span class="font-semibold text-gray-600 w-24 inline-block">Giới tính:</span> <span id="ptGender" class="text-gray-800">—</span></p>
                     <p><span class="font-semibold text-gray-600 w-24 inline-block">SĐT:</span> <span id="ptPhone" class="text-gray-800">—</span></p>
                     <p><span class="font-semibold text-gray-600 w-24 inline-block">Địa chỉ:</span> <span id="ptAddress" class="text-gray-800">—</span></p>
                 </div>
+
+                {{-- Edit Patient Info Box (Hidden by default) --}}
+                <div id="patientInfoEdit" class="hidden bg-gray-50 border border-gray-200 rounded-xl p-4 mb-4 space-y-3">
+                    <p class="font-bold text-gray-700 text-sm mb-1">Chỉnh sửa bệnh nhân</p>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Họ tên</label>
+                        <input type="text" id="editPtName" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Năm sinh</label>
+                            <input type="number" id="editPtBirthYear" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase">Giới tính</label>
+                            <select id="editPtGender" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm bg-white focus:border-blue-500">
+                                <option value="1">Nam</option>
+                                <option value="0">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">SĐT</label>
+                        <input type="text" id="editPtPhone" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Địa chỉ</label>
+                        <input type="text" id="editPtAddress" class="w-full px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <button onclick="savePatientInfo()" class="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold shadow-sm hover:bg-blue-700">Lưu</button>
+                        <button onclick="toggleEditPatient('view')" class="flex-1 py-2 bg-white border border-gray-300 text-gray-600 rounded-lg text-sm font-bold hover:bg-gray-50">Hủy</button>
+                    </div>
+                </div>
+
                 <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm space-y-1.5">
                     <p class="font-semibold text-gray-700 mb-2">Thông tin lịch hẹn</p>
                     <p><span class="text-gray-600 w-24 inline-block">Bác sĩ:</span> <span id="aptDoctor" class="font-medium text-gray-800">—</span></p>
@@ -59,6 +97,24 @@
                         </div>
                         <svg class="w-5 h-5 text-emerald-500 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                     </a>
+                </div>
+
+                {{-- Action: Xác nhận lịch (chỉ hiện khi status = unconfirmed) --}}
+                <div id="confirmActionBox" class="hidden mt-4">
+                    <button onclick="confirmAppointment()"
+                            class="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl transition-colors font-bold shadow-sm">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Xác nhận lịch hẹn
+                    </button>
+                </div>
+
+                {{-- Action: Hủy lịch (hiện khi status != complete && status != cancel) --}}
+                <div id="cancelActionBox" class="hidden mt-3">
+                    <button onclick="cancelAppointment()"
+                            class="w-full flex items-center justify-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-semibold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Hủy bỏ lịch hẹn này
+                    </button>
                 </div>
             </div>
 
@@ -175,9 +231,13 @@
         <h2 class="text-2xl font-bold text-gray-800">Tiếp nhận bệnh nhân</h2>
         <p class="text-gray-500 text-sm mt-1">Lễ tân — {{ \Carbon\Carbon::now()->format('d/m/Y') }}</p>
     </div>
-    <div class="mt-4 md:mt-0 flex items-center gap-3">
-        <input type="date" id="filterDate" value="{{ date('Y-m-d') }}" onchange="loadAppointments()"
-               class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500">
+    <div class="mt-4 md:mt-0 flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2 bg-white px-3 py-1.5 border border-gray-300 rounded-lg shadow-sm">
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <input type="date" id="filterDate" value="{{ date('Y-m-d') }}" onchange="loadAppointments()"
+                   class="border-none p-0 text-sm focus:ring-0 text-gray-700 bg-transparent">
+        </div>
+
         <button onclick="openNewApt()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
             <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
             Đặt lịch mới
@@ -186,21 +246,42 @@
 </div>
 
 {{-- Stats --}}
-<div class="grid grid-cols-3 gap-4 mb-6">
+<div class="grid grid-cols-4 gap-4 mb-6">
+    <div onclick="filterByStatus('unconfirmed')" id="card-unconfirmed"
+         class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all">
+        <p class="text-2xl font-bold text-amber-700" id="cntUnconfirmed">—</p>
+        <p class="text-[10px] text-amber-600 font-medium mt-1">Chờ xác nhận</p>
+    </div>
     <div onclick="filterByStatus('pending')" id="card-pending"
          class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all">
         <p class="text-2xl font-bold text-yellow-700" id="cntPending">—</p>
-        <p class="text-xs text-yellow-600 font-medium mt-1">Chờ khám</p>
+        <p class="text-[10px] text-yellow-600 font-medium mt-1">Chờ khám</p>
     </div>
     <div onclick="filterByStatus('inprocess')" id="card-inprocess"
          class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all">
         <p class="text-2xl font-bold text-blue-700" id="cntInprocess">—</p>
-        <p class="text-xs text-blue-600 font-medium mt-1">Đang khám</p>
+        <p class="text-[10px] text-blue-600 font-medium mt-1">Đang khám</p>
     </div>
     <div onclick="filterByStatus('complete')" id="card-complete"
          class="bg-green-50 border border-green-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all">
         <p class="text-2xl font-bold text-green-700" id="cntComplete">—</p>
-        <p class="text-xs text-green-600 font-medium mt-1">Hoàn thành</p>
+        <p class="text-[10px] text-green-600 font-medium mt-1">Hoàn thành</p>
+    </div>
+    <div onclick="filterByStatus('cancel')" id="card-cancel"
+         class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-center cursor-pointer hover:shadow-md hover:scale-[1.02] transition-all">
+        <p class="text-2xl font-bold text-gray-700" id="cntCancel">—</p>
+        <p class="text-[10px] text-gray-600 font-medium mt-1">Đã hủy</p>
+    </div>
+</div>
+
+{{-- Workload Summary --}}
+<div id="workloadSummary" class="mb-6 p-4 bg-white border border-gray-100 rounded-xl shadow-sm hidden">
+    <div class="flex items-center gap-2 mb-3">
+        <div class="w-1.5 h-4 bg-blue-600 rounded-full"></div>
+        <h3 class="text-sm font-bold text-gray-800 uppercase tracking-wider">Mật độ công việc bác sĩ</h3>
+    </div>
+    <div id="workloadList" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        {{-- JS Render --}}
     </div>
 </div>
 
@@ -217,6 +298,7 @@ let currentInvoiceId = null;
 let currentAptTab = 'existing';
 let allAppointments = []; // Cache for filtering
 let currentStatusFilter = 'all';
+let currentDoctorFilter = 'all';
 
 // =========================================================
 // APPOINTMENT LIST
@@ -227,28 +309,87 @@ function loadAppointments() {
     .then(r => r.json())
     .then(data => {
         allAppointments = data.appointments;
+        renderWorkload(data.appointments);
         renderAppointments();
     })
     .catch(e => console.error(e));
 }
 
+function renderWorkload(apts) {
+    const counts = {};
+    apts.forEach(a => {
+        const drName = a.doctor && a.doctor.user ? a.doctor.user.full_name : 'N/A';
+        const drId   = a.doctor_id || 'na';
+        if (!counts[drId]) counts[drId] = { id: drId, name: drName, count: 0 };
+        counts[drId].count++;
+    });
+
+    const list = document.getElementById('workloadList');
+    const container = document.getElementById('workloadSummary');
+    
+    if (apts.length === 0) {
+        container.classList.add('hidden');
+        return;
+    }
+    
+    container.classList.remove('hidden');
+
+    // "All Doctors" Card
+    const allActive = currentDoctorFilter === 'all';
+    let html = `
+        <div onclick="filterByDoctor('all')" 
+             class="cursor-pointer border-2 rounded-lg p-2 flex flex-col items-center justify-center transition-all ${allActive ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-gray-300'}">
+            <p class="text-[10px] text-gray-400 font-bold uppercase">Tất cả BS</p>
+            <p class="text-lg font-bold text-blue-700">${apts.length} ca</p>
+        </div>
+    `;
+
+    // Doctor Cards
+    html += Object.values(counts).sort((a,b) => b.count - a.count).map(c => {
+        const isActive = currentDoctorFilter == c.id;
+        const isDense  = c.count >= 10;
+        return `
+        <div onclick="filterByDoctor(${c.id})" 
+             class="cursor-pointer border-2 rounded-lg p-2 flex flex-col items-center justify-center transition-all ${isActive ? 'border-blue-500 bg-blue-50 shadow-sm' : 'border-gray-100 bg-gray-50 hover:border-gray-300'}">
+            <p class="text-xs text-gray-500 truncate w-full text-center" title="${c.name}">${c.name}</p>
+            <p class="text-lg font-bold ${isDense ? 'text-red-600' : 'text-gray-800'}">${c.count} ca</p>
+            ${isDense ? '<span class="text-[8px] bg-red-100 text-red-700 px-1 rounded font-bold">DÀY ĐẶC</span>' : ''}
+        </div>`;
+    }).join('');
+
+    list.innerHTML = html;
+}
+
+function filterByDoctor(drId) {
+    currentDoctorFilter = drId;
+    renderWorkload(allAppointments);
+    renderAppointments();
+}
+
 function renderAppointments() {
     const apts = allAppointments;
 
-    document.getElementById('cntPending').innerText   = apts.filter(a => a.status === 'pending').length;
-    document.getElementById('cntInprocess').innerText = apts.filter(a => a.status === 'inprocess').length;
-    document.getElementById('cntComplete').innerText  = apts.filter(a => a.status === 'complete').length;
+    document.getElementById('cntUnconfirmed').innerText = apts.filter(a => a.status === 'unconfirmed').length;
+    document.getElementById('cntPending').innerText     = apts.filter(a => a.status === 'pending').length;
+    document.getElementById('cntInprocess').innerText   = apts.filter(a => a.status === 'inprocess').length;
+    document.getElementById('cntComplete').innerText    = apts.filter(a => a.status === 'complete').length;
+    document.getElementById('cntCancel').innerText      = apts.filter(a => a.status === 'cancel').length;
 
-    // Filter by current status
+    // Filter by status & doctor 
     let filtered = apts;
     if (currentStatusFilter !== 'all') {
-        filtered = apts.filter(a => a.status === currentStatusFilter);
+        filtered = filtered.filter(a => a.status === currentStatusFilter);
+    }
+    if (currentDoctorFilter !== 'all') {
+        filtered = filtered.filter(a => a.doctor_id == currentDoctorFilter);
     }
 
     const statusCfg = {
-        pending:   { label: '⏳ Chờ khám',   bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', dot: 'bg-yellow-400' },
-        inprocess: { label: '🔵 Đang khám',  bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-200',   dot: 'bg-blue-500' },
-        complete:  { label: '✅ Hoàn thành', bg: 'bg-green-50',  text: 'text-green-700',  border: 'border-green-200',  dot: 'bg-green-500' },
+        unconfirmed: { label: '🟠 Chờ xác nhận', bg: 'bg-amber-50',  text: 'text-amber-700', border: 'border-amber-200', dot: 'bg-amber-500' },
+        pending:     { label: '⏳ Chờ khám',     bg: 'bg-yellow-50', text: 'text-yellow-700', border: 'border-yellow-200', dot: 'bg-yellow-400' },
+        inprocess:   { label: '🔵 Đang khám',    bg: 'bg-blue-50',   text: 'text-blue-700',   border: 'border-blue-200',   dot: 'bg-blue-500' },
+        complete:    { label: '✅ Hoàn thành',   bg: 'bg-green-50',  text: 'text-green-700',  border: 'border-green-200',  dot: 'bg-green-500' },
+        cancel:      { label: '❌ Đã hủy',       bg: 'bg-gray-50',   text: 'text-gray-700',   border: 'border-gray-200',   dot: 'bg-gray-400' },
     };
 
     if (filtered.length === 0) {
@@ -271,17 +412,20 @@ function renderAppointments() {
                 <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-lg group-hover:bg-blue-200 transition-colors">
                     ${a.patient ? a.patient.full_name.charAt(0).toUpperCase() : '?'}
                 </div>
-                <div>
-                    <p class="font-bold text-gray-800 text-base">${a.patient ? a.patient.full_name : 'N/A'}</p>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="text-[10px] font-bold bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded leading-none">#${a.id}</span>
+                        <h4 class="font-bold text-gray-800 truncate">${a.patient ? a.patient.full_name : 'N/A'}</h4>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${cfg.bg} ${cfg.text} border ${cfg.border}">
+                            ${cfg.label}
+                        </span>
+                    </div>
                     <p class="text-xs text-gray-500 mt-0.5">
                         BS. ${a.doctor && a.doctor.user ? a.doctor.user.full_name : 'Chưa phân công'} — <span class="bg-gray-100 px-1.5 py-0.5 rounded font-medium">🕒 ${time}</span>
                     </p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${cfg.bg} ${cfg.text} border ${cfg.border}">
-                    <span class="w-1.5 h-1.5 rounded-full ${cfg.dot}"></span>${cfg.label}
-                </span>
                 <svg class="w-5 h-5 text-gray-300 group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </div>
         </div>`;
@@ -304,16 +448,18 @@ function filterByStatus(status) {
     }
 
     // Update UI active state
-    ['pending', 'inprocess', 'complete'].forEach(s => {
+    ['unconfirmed', 'pending', 'inprocess', 'complete', 'cancel'].forEach(s => {
         const card = document.getElementById('card-' + s);
         if (s === currentStatusFilter) {
             card.classList.add('ring-2', 'ring-offset-2', 'shadow-md', 'scale-[1.02]');
             card.classList.remove('hover:scale-[1.02]');
+            if (s === 'unconfirmed') card.classList.add('ring-amber-400');
             if (s === 'pending') card.classList.add('ring-yellow-400');
             if (s === 'inprocess') card.classList.add('ring-blue-400');
             if (s === 'complete') card.classList.add('ring-green-400');
+            if (s === 'cancel') card.classList.add('ring-gray-400');
         } else {
-            card.classList.remove('ring-2', 'ring-offset-2', 'ring-yellow-400', 'ring-blue-400', 'ring-green-400', 'shadow-md', 'scale-[1.02]');
+            card.classList.remove('ring-2', 'ring-offset-2', 'ring-amber-400', 'ring-yellow-400', 'ring-blue-400', 'ring-green-400', 'ring-gray-400', 'shadow-md', 'scale-[1.02]');
             card.classList.add('hover:scale-[1.02]');
         }
     });
@@ -324,8 +470,12 @@ function filterByStatus(status) {
 // =========================================================
 // SLIDE PANEL
 // =========================================================
+let currentPatientId = null;
+
 function openPanel(a) {
     currentAptId = a.id;
+    currentPatientId = a.patient_id;
+    toggleEditPatient('view');
 
     const pt  = a.patient || {};
     const dr  = a.doctor && a.doctor.user ? a.doctor.user : {};
@@ -340,27 +490,45 @@ function openPanel(a) {
     document.getElementById('ptGender').innerText    = pt.gender == 1 ? 'Nam' : (pt.gender == 0 ? 'Nữ' : '—');
     document.getElementById('ptPhone').innerText     = pt.phone || '—';
     document.getElementById('ptAddress').innerText   = pt.address || '—';
+
+    // Set edit inputs
+    document.getElementById('editPtName').value      = pt.full_name || '';
+    document.getElementById('editPtBirthYear').value = pt.birth_year || '';
+    document.getElementById('editPtGender').value    = pt.gender ?? '1';
+    document.getElementById('editPtPhone').value     = pt.phone || '';
+    document.getElementById('editPtAddress').value   = pt.address || '';
+
     document.getElementById('aptDoctor').innerText   = dr.full_name || '—';
     document.getElementById('panelAptDate').innerText = a.date;
     document.getElementById('panelAptTime').innerText = time;
 
     const statusLabel = {
-        pending:   '⏳ Chờ khám',
-        inprocess: '🔵 Đang khám',
-        complete:  '✅ Hoàn thành',
+        unconfirmed: '🟠 Chờ xác nhận',
+        pending:     '⏳ Chờ khám',
+        inprocess:   '🔵 Đang khám',
+        complete:    '✅ Hoàn thành',
+        cancel:      '❌ Đã hủy',
     }[a.status] || a.status;
 
     const statusBadge = document.getElementById('statusBadge');
     statusBadge.innerText = statusLabel;
     statusBadge.className = `px-3 py-1 rounded-full text-xs font-semibold border ` + ({
-        pending:   'bg-yellow-50 text-yellow-700 border-yellow-200',
-        inprocess: 'bg-blue-50 text-blue-700 border-blue-200',
-        complete:  'bg-green-50 text-green-700 border-green-200',
+        unconfirmed: 'bg-amber-50 text-amber-700 border-amber-200',
+        pending:     'bg-yellow-50 text-yellow-700 border-yellow-200',
+        inprocess:   'bg-blue-50 text-blue-700 border-blue-200',
+        complete:    'bg-green-50 text-green-700 border-green-200',
+        cancel:      'bg-gray-50 text-gray-700 border-gray-200',
     }[a.status] || '');
 
-    // Show/hide invoice link based on status
+    // Action buttons
     const invLink = document.getElementById('invoiceLinkBox');
     if (invLink) invLink.classList.toggle('hidden', a.status !== 'complete');
+
+    const confirmBox = document.getElementById('confirmActionBox');
+    if (confirmBox) confirmBox.classList.toggle('hidden', a.status !== 'unconfirmed');
+
+    const cancelBox = document.getElementById('cancelActionBox');
+    if (cancelBox) cancelBox.classList.toggle('hidden', a.status === 'complete' || a.status === 'cancel');
 
     document.getElementById('examPanel').classList.remove('hidden');
     setTimeout(() => {
@@ -378,7 +546,104 @@ function closePanel() {
 
 
 
-// No invoice functions needed here — managed in reception/invoices page
+async function cancelAppointment() {
+    if (!currentAptId) return;
+    
+    showConfirm('Bạn có chắc chắn muốn HỦY lịch hẹn này không?', async () => {
+        try {
+            const res = await fetch(`/reception/appointments/${currentAptId}/status`, {
+            method: 'PUT',
+            headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ status: 'cancel' })
+        }).then(r => r.json());
+
+            if (res.status === 'success') {
+                showToast('Đã hủy lịch hẹn', 'info');
+                closePanel();
+            } else {
+                showToast(res.message || 'Lỗi hủy lịch', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Lỗi kết nối', 'error');
+        }
+    }, null, { title: 'Hủy lịch hẹn', type: 'error', confirmText: 'Đồng ý hủy' });
+}
+
+function toggleEditPatient(mode) {
+    const isEdit = mode === 'edit';
+    document.getElementById('patientInfoView').classList.toggle('hidden', isEdit);
+    document.getElementById('patientInfoEdit').classList.toggle('hidden', !isEdit);
+}
+
+async function savePatientInfo() {
+    if (!currentPatientId) return;
+    
+    const data = {
+        full_name:  document.getElementById('editPtName').value.trim(),
+        birth_year: document.getElementById('editPtBirthYear').value || null,
+        gender:     document.getElementById('editPtGender').value,
+        phone:      document.getElementById('editPtPhone').value.trim(),
+        address:    document.getElementById('editPtAddress').value.trim(),
+    };
+
+    if (!data.full_name) return showToast('Họ tên không được để trống', 'warning');
+
+    try {
+        const res = await fetch(`/reception/patients/${currentPatientId}`, {
+            method: 'POST',
+            headers: { 
+                'X-CSRF-TOKEN': token, 
+                'Content-Type': 'application/json', 
+                'Accept': 'application/json',
+                'X-HTTP-Method-Override': 'PUT'
+            },
+            body: JSON.stringify(data)
+        }).then(r => r.json());
+
+        if (res.status === 'success') {
+            showToast('Đã cập nhật thông tin bệnh nhân', 'success');
+            loadAppointments(); 
+            document.getElementById('ptName').innerText      = data.full_name;
+            document.getElementById('ptBirthYear').innerText = data.birth_year || '—';
+            document.getElementById('ptGender').innerText    = data.gender == 1 ? 'Nam' : 'Nữ';
+            document.getElementById('ptPhone').innerText     = data.phone || '—';
+            document.getElementById('ptAddress').innerText   = data.address || '—';
+            document.getElementById('panelPatientName').innerText = data.full_name;
+            
+            toggleEditPatient('view');
+        } else {
+            alert(res.message || 'Lỗi cập nhật');
+        }
+    } catch (e) {
+        console.error(e);
+        alert('Lỗi kết nối');
+    }
+}
+
+async function confirmAppointment() {
+    if (!currentAptId) return;
+    
+    showConfirm('Xác nhận lịch hẹn này và chuyển sang danh sách chờ khám?', async () => {
+        try {
+            const res = await fetch(`/reception/appointments/${currentAptId}/status`, {
+            method: 'PUT',
+            headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ status: 'pending' })
+        }).then(r => r.json());
+
+            if (res.status === 'success') {
+                showToast('Đã xác nhận lịch hẹn', 'success');
+                closePanel();
+            } else {
+                showToast(res.message || 'Lỗi xác nhận', 'error');
+            }
+        } catch (e) {
+            console.error(e);
+            showToast('Lỗi kết nối', 'error');
+        }
+    }, null, { title: 'Xác nhận lịch hẹn', type: 'info', confirmText: 'Xác nhận ngay' });
+}
 
 // =========================================================
 // NEW APPOINTMENT MODAL

@@ -64,14 +64,8 @@
                         <tr class="hover:bg-gray-50/50 transition-colors">
                             <td class="py-3 px-6 font-medium text-gray-900">#{{ $user->id }}</td>
                             <td class="py-3 px-6 flex items-center gap-3">
-                                <div class="h-10 w-10 rounded-full flex-shrink-0 shadow-sm border border-gray-200 overflow-hidden">
-                                    @if($user->avatar)
-                                        <img src="{{ asset($user->avatar) }}" class="h-full w-full object-cover" alt="{{ $user->full_name }}">
-                                    @else
-                                        <div class="h-full w-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-base">
-                                            {{ substr($user->full_name, 0, 1) }}
-                                        </div>
-                                    @endif
+                                <div class="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-base shadow-sm border border-blue-200">
+                                    {{ substr($user->full_name, 0, 1) }}
                                 </div>
                                 <div>
                                     <div class="font-medium text-gray-800">{{ $user->full_name }}</div>
@@ -146,10 +140,6 @@
             document.getElementById('g_male').checked = false;
             document.getElementById('g_female').checked = false;
 
-            // reset avatar preview
-            document.getElementById('avatarPreview').src = "https://ui-avatars.com/api/?name=User&background=random";
-            document.getElementById('f_avatar').value = "";
-
             // reset select nếu cần
             document.getElementById('f_status').value = "";
             document.getElementById('f_role').value = "";
@@ -194,13 +184,6 @@
                     } else {
                         document.getElementById('specialty').value = '';
                         document.getElementById('is_free').value = '0';
-                    }
-
-                    // avatar preview
-                    if (user.avatar) {
-                        document.getElementById('avatarPreview').src = '/' + user.avatar;
-                    } else {
-                        document.getElementById('avatarPreview').src = `https://ui-avatars.com/api/?name=${user.full_name}&background=random`;
                     }
 
                     // title

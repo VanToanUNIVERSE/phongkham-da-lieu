@@ -51,6 +51,7 @@
         
         {{-- Shared Modals --}}
         @include('partials.confirm_delete_modal')
+        @include('partials.notifications')
         
     </div>
 </body>

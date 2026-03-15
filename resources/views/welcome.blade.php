@@ -185,13 +185,11 @@
         }
         .doctor-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(14,165,233,0.1); background: white; border-color: #bae6fd; }
         .doctor-avatar {
-            width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 16px;
+            width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 16px;
             background: linear-gradient(135deg, #0ea5e9, #6366f1);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.8rem; font-weight: 800; color: white;
-            overflow: hidden; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-size: 1.6rem; font-weight: 800; color: white;
         }
-        .doctor-avatar img { width: 100%; height: 100%; object-cover: cover; }
         .doctor-card h3 { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
         .doctor-specialty { font-size: 0.8rem; color: #0284c7; font-weight: 600; background: #f0f9ff; padding: 3px 10px; border-radius: 999px; display: inline-block; margin-bottom: 10px; }
         .doctor-card p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
@@ -274,6 +272,45 @@
         .msg-box.success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; display: block; }
         .msg-box.error   { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; display: block; }
 
+        /* TIME SLOTS */
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .time-slot {
+            padding: 8px 4px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: white;
+            color: #475569;
+        }
+        .time-slot:hover:not(.disabled) {
+            border-color: #0ea5e9;
+            color: #0ea5e9;
+            background: #f0f9ff;
+        }
+        .time-slot.selected {
+            background: #0ea5e9;
+            color: white;
+            border-color: #0ea5e9;
+            box-shadow: 0 4px 12px rgba(14,165,233,0.3);
+        }
+        .time-slot.disabled {
+            background: #f1f5f9;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+            cursor: not-allowed;
+            opacity: 0.6;
+            text-decoration: line-through;
+        }
+
         @media (max-width: 900px) {
             .hero-inner, .booking-grid, .contact-grid { grid-template-columns: 1fr; }
             .features-grid, .services-grid { grid-template-columns: 1fr 1fr; }
@@ -300,6 +337,7 @@
         <a href="#ve-chung">Giới thiệu</a>
         <a href="#dich-vu">Dịch vụ</a>
         <a href="#bac-si">Bác sĩ</a>
+        <a href="{{ route('public.lookup') }}" class="font-bold text-blue-600">Tra cứu kết quả</a>
         <a href="#lien-he">Liên hệ</a>
         <a href="{{ route('login') }}" class="login-link">Đăng nhập</a>
         <a href="#dat-lich" class="btn-booking-nav">Đặt lịch ngay</a>
@@ -315,6 +353,7 @@
             <p class="hero-desc">Đội ngũ bác sĩ da liễu giàu kinh nghiệm, trang thiết bị hiện đại, quy trình khám bệnh chuẩn quốc tế. Sức khỏe làn da của bạn là ưu tiên hàng đầu của chúng tôi.</p>
             <div class="hero-ctas">
                 <a href="#dat-lich" class="btn-primary">📅 Đặt lịch khám</a>
+                <a href="{{ route('public.lookup') }}" class="btn-secondary">🔍 Tra cứu kết quả</a>
                 <a href="#dich-vu" class="btn-secondary">Xem dịch vụ →</a>
             </div>
             <div class="hero-stats">
@@ -344,8 +383,19 @@
                         <input type="date" id="q_date" min="{{ date('Y-m-d') }}">
                     </div>
                     <div>
-                        <label for="q_time">Giờ khám <span class="req">*</span></label>
-                        <input type="time" id="q_time" value="08:00">
+                        <label for="q_doctor">Chọn bác sĩ</label>
+                        <select id="q_doctor">
+                            <option value="">-- Bất kỳ --</option>
+                            @foreach($doctors as $doctor)
+                            <option value="{{ $doctor->id }}">BS. {{ $doctor->user->full_name ?? '?' }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Giờ khám <span class="req">*</span></label>
+                    <div id="q_time_slots" class="time-grid">
+                        <!-- Slots will be rendered here -->
                     </div>
                 </div>
                 <div id="quickMsg"></div>
@@ -460,11 +510,7 @@
             @forelse($doctors as $doctor)
             <div class="doctor-card">
                 <div class="doctor-avatar">
-                    @if($doctor->user && $doctor->user->avatar)
-                        <img src="{{ asset($doctor->user->avatar) }}" alt="{{ $doctor->user->full_name }}">
-                    @else
-                        {{ mb_substr($doctor->user->full_name ?? 'B', 0, 1) }}
-                    @endif
+                    {{ mb_substr($doctor->user->full_name ?? 'B', 0, 1) }}
                 </div>
                 <h3>BS. {{ $doctor->user->full_name ?? 'Chuyên khoa' }}</h3>
                 <div class="doctor-specialty">{{ $doctor->specialty ?? 'Da Liễu' }}</div>
@@ -549,8 +595,10 @@
                             <input type="date" id="b_date" min="{{ date('Y-m-d') }}">
                         </div>
                         <div>
-                            <label for="b_time">Giờ khám <span class="req">*</span></label>
-                            <input type="time" id="b_time" value="08:00">
+                            <label>Giờ khám <span class="req">*</span></label>
+                            <div id="b_time_slots" class="time-grid">
+                                <!-- Slots will be rendered here -->
+                            </div>
                         </div>
                     </div>
                     <div>
@@ -619,6 +667,10 @@
 
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
+const ALL_SLOTS = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
+
+let quickSelectedTime = null;
+let mainSelectedTime = null;
 
 // Navbar scroll effect
 window.addEventListener('scroll', () => {
@@ -631,10 +683,11 @@ async function submitQuick() {
     const msg = document.getElementById('quickMsg');
     msg.className = ''; msg.textContent = '';
 
-    const name  = document.getElementById('q_name').value.trim();
-    const phone = document.getElementById('q_phone').value.trim();
-    const date  = document.getElementById('q_date').value;
-    const time  = document.getElementById('q_time').value;
+    const name     = document.getElementById('q_name').value.trim();
+    const phone    = document.getElementById('q_phone').value.trim();
+    const date     = document.getElementById('q_date').value;
+    const doctorId = document.getElementById('q_doctor').value;
+    const time     = quickSelectedTime;
 
     if (!name || !phone || !date || !time) {
         msg.className = 'msg-box error';
@@ -648,7 +701,7 @@ async function submitQuick() {
         const res = await fetch('{{ route("public.booking") }}', {
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': CSRF, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-            body: JSON.stringify({ full_name: name, phone, date, time })
+            body: JSON.stringify({ full_name: name, phone, date, time, doctor_id: doctorId })
         }).then(r => r.json());
 
         if (res.status === 'success') {
@@ -657,6 +710,9 @@ async function submitQuick() {
             document.getElementById('q_name').value = '';
             document.getElementById('q_phone').value = '';
             document.getElementById('q_date').value = '';
+            document.getElementById('q_doctor').value = '';
+            quickSelectedTime = null;
+            updateAvailability('q');
         } else {
             const errs = res.errors ? Object.values(res.errors).flat().join(' ') : (res.message || 'Có lỗi xảy ra.');
             msg.className = 'msg-box error';
@@ -681,7 +737,7 @@ async function submitBooking() {
     const gender   = document.getElementById('b_gender').value;
     const doctorId = document.getElementById('b_doctor').value;
     const date     = document.getElementById('b_date').value;
-    const time     = document.getElementById('b_time').value;
+    const time     = mainSelectedTime;
     const note     = document.getElementById('b_note').value.trim();
 
     if (!name || !phone || !date || !time) {
@@ -713,7 +769,8 @@ async function submitBooking() {
             ['b_name','b_phone','b_date','b_note'].forEach(id => document.getElementById(id).value = '');
             document.getElementById('b_gender').value = '';
             document.getElementById('b_doctor').value = '';
-            document.getElementById('b_time').value = '08:00';
+            mainSelectedTime = null;
+            updateAvailability('b');
         } else {
             const errs = res.errors ? Object.values(res.errors).flat().join(' ') : (res.message || 'Có lỗi xảy ra.');
             msg.className = 'msg-box error';
@@ -728,9 +785,69 @@ async function submitBooking() {
     btn.disabled = false; btn.textContent = '✅ Xác nhận đặt lịch';
 }
 
-// Set min date to today
-document.getElementById('q_date').value = new Date().toISOString().split('T')[0];
-document.getElementById('b_date').value = new Date().toISOString().split('T')[0];
+// Availability Logic
+async function updateAvailability(section) {
+    const doctorId = document.getElementById(section + '_doctor').value;
+    const date = document.getElementById(section + '_date').value;
+    const container = document.getElementById(section + '_time_slots');
+
+    if (!doctorId || !date) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 10px;">Vui lòng chọn bác sĩ và ngày khám để xem lịch trống.</p>';
+        return;
+    }
+
+    container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 10px;">⏳ Đang tải...</p>';
+
+    try {
+        const res = await fetch(`{{ route('booked.slots') }}?doctor_id=${doctorId}&date=${date}`).then(r => r.json());
+        const booked = res.booked_times || [];
+        renderSlots(section, booked);
+    } catch (e) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: #ef4444; grid-column: 1/-1; text-align: center; padding: 10px;">Lỗi tải lịch. Vui lòng thử lại.</p>';
+    }
+}
+
+function renderSlots(section, booked) {
+    const container = document.getElementById(section + '_time_slots');
+    container.innerHTML = '';
+
+    ALL_SLOTS.forEach(slot => {
+        const isBooked = booked.includes(slot);
+        const div = document.createElement('div');
+        div.className = 'time-slot' + (isBooked ? ' disabled' : '');
+        div.textContent = slot;
+
+        if (!isBooked) {
+            div.onclick = () => {
+                container.querySelectorAll('.time-slot').forEach(s => s.classList.remove('selected'));
+                div.classList.add('selected');
+                if (section === 'q') quickSelectedTime = slot;
+                else mainSelectedTime = slot;
+            };
+
+            // Auto-select first available if none selected? No, better let user choose.
+            if ((section === 'q' && quickSelectedTime === slot) || (section === 'b' && mainSelectedTime === slot)) {
+                div.classList.add('selected');
+            }
+        }
+        container.appendChild(div);
+    });
+}
+
+// Event Listeners
+['q', 'b'].forEach(section => {
+    document.getElementById(section + '_doctor').addEventListener('change', () => updateAvailability(section));
+    document.getElementById(section + '_date').addEventListener('change', () => updateAvailability(section));
+});
+
+// Init
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('q_date').value = today;
+document.getElementById('b_date').value = today;
+
+// Trigger update for pre-filled values
+updateAvailability('q');
+updateAvailability('b');
 </script>
 </body>
 </html>
