@@ -62,6 +62,11 @@
                         <svg class="h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                         <span class="font-semibold text-sm">Đơn thuốc</span>
                     </a>
+                    <a href="{{ route('pharmacy.transactions') }}" 
+                       class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all {{ request()->routeIs('pharmacy.transactions') ? 'bg-blue-600 text-white shadow-xl shadow-blue-900/40' : 'hover:bg-slate-900 hover:text-white' }}">
+                        <svg class="h-5 w-5 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" /></svg>
+                        <span class="font-semibold text-sm">Lịch sử xuất nhập kho</span>
+                    </a>
                 </div>
             </div>
 
@@ -83,12 +88,7 @@
             </div>
         </nav>
         
-        <div class="p-6 w-full border-t border-slate-900">
-            <div class="px-3 py-4 bg-slate-900/50 rounded-2xl">
-                <p class="text-[10px] text-slate-500 font-bold mb-1 uppercase tracking-wider">Phiên bản</p>
-                <p class="text-xs text-slate-300 font-bold italic">v2.0.4 - Premium Edition</p>
-            </div>
-        </div>
+
     </aside>
 @elseif (auth()->check() && in_array(auth()->user()->role->name, ['Lễ tân', 'Lễ tân']))
     <aside class="w-64 bg-slate-900 border-r border-slate-800 text-slate-300 flex-shrink-0 flex flex-col items-center">
@@ -145,6 +145,18 @@
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('doctor.appointments') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
                 Lịch khám hôm nay
+            </a>
+
+            <a href="{{ route('doctor.medical_records') }}" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('doctor.medical_records') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Quản lý hồ sơ
+            </a>
+
+            <a href="{{ route('doctor.prescriptions') }}" 
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors {{ request()->routeIs('doctor.prescriptions') ? 'bg-blue-600 text-white shadow-lg' : 'hover:bg-slate-800 hover:text-white' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 opacity-75" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                Quản lý đơn thuốc
             </a>
         </nav>
         

@@ -109,6 +109,9 @@ Route::prefix('pharmacy')->middleware('auth')->group(function () {
 
 Route::prefix('patient')->middleware('auth')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Patient\PatientDashboardController::class, 'dashboard'])->name('patient.dashboard');
+    Route::get('/profile', [\App\Http\Controllers\Patient\PatientDashboardController::class, 'editProfile'])->name('patient.profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\Patient\PatientDashboardController::class, 'updateProfile'])->name('patient.profile.update');
+    Route::post('/appointments/{appointment}/cancel', [\App\Http\Controllers\Patient\PatientDashboardController::class, 'cancelAppointment'])->name('patient.appointments.cancel');
 });
 Route::middleware('auth')->group(function () {
     Route::get('/change-password', [\App\Http\Controllers\ProfileController::class, 'showChangePassword'])->name('profile.change-password');

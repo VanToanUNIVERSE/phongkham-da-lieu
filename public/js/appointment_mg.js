@@ -1,4 +1,4 @@
-﻿const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
 const id = document.getElementById('id');
 const doctorId = document.getElementById('doctor_id');
@@ -46,14 +46,29 @@ function resetForm() {
     });
     
     // Reset border color
+    if(btn) btn.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Lưu Lịch hẹn';
+    id.value = "";
+    doctorId.value = "";
+    patientId.value = "";
+    date.value='';
+    time.value='';
+    aStatus.value = "";
+    /* message.innerHTML = ""; */
+        // Clear errors
+    document.querySelectorAll('[id^="err_"]').forEach(el => {
+        el.innerText = "";
+        el.classList.add('hidden');
+    });
+    
+    // Reset border color
     document.querySelectorAll('input, select, textarea').forEach(el => {
         el.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
         el.classList.add('border-gray-300', 'focus:border-blue-500', 'focus:ring-blue-500');
     });
 }
 
-function loadData() {
-    fetch('/appointments/loadData')
+function loadData(search = '') {
+    fetch(`/appointments/loadData?search=${search}`)
     .then(res => res.json())
     .then(data => {
         let html = `
@@ -206,9 +221,10 @@ function del(nid) {
     showDeleteConfirm(nid, 'mục Lịch khám này', '/appointments');
 }
 
+function searchAppointment() {
+    const search = document.getElementById('appointmentSearch').value;
+    loadData(search);
+}
+
 // Gọi hàm loadData khi trang được tải xong để cập nhật dữ liệu bảng
 loadData();
-
-
-
-

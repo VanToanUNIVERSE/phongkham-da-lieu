@@ -137,8 +137,15 @@ class AppointmentController extends Controller
         ]);
     }
 
-    function loadData() {
+    function loadData(Request $request) {
+        $search = $request->query('search');
         $appointments = Appointment::with(['doctor.user', 'patient'])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('patient', function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%")
+                      ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
             ->orderByRaw("
                 CASE status
                     WHEN 'pending' THEN 1

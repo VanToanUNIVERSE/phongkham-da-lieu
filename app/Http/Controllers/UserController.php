@@ -6,15 +6,24 @@ use App\Models\Doctor;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->query('search');
+        $users = User::with('role')
+            ->when($search, function ($query, $search) {
+                return $query->where('username', 'like', "%{$search}%")
+                    ->orWhere('full_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            })
+            ->get();
+        return response()->json(['users' => $users]);
     }
 
     /**
@@ -41,7 +50,7 @@ class UserController extends Controller
             'role_id' => 'required|exists:roles,id',
             ]);
 
-        $user = User::create([
+        $data = [
             'username'   => $request->username,
             'password'   => Hash::make($request->password),
             'full_name'  => $request->full_name,
@@ -50,7 +59,14 @@ class UserController extends Controller
             'phone'      => $request->phone,
             'status'     => $request->status,
             'role_id'    => $request->role_id,
-            ]);
+        ];
+
+        if ($request->hasFile('avatar')) {
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
+        }
+
+        $user = User::create($data);
 
         if ($request->role_id == 2) {
             $user->doctor()->create([
@@ -106,6 +122,15 @@ class UserController extends Controller
         // nếu nhập password mới thì đổi
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('avatar')) {
+            // Xóa avatar cũ nếu có
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $path = $request->file('avatar')->store('avatars', 'public');
+            $data['avatar'] = $path;
         }
 
         $user->update($data);

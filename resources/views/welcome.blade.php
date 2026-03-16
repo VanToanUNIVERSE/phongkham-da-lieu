@@ -185,11 +185,14 @@
         }
         .doctor-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(14,165,233,0.1); background: white; border-color: #bae6fd; }
         .doctor-avatar {
-            width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 16px;
-            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 20px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.6rem; font-weight: 800; color: white;
+            font-size: 2rem; font-weight: 800; color: #0ea5e9;
+            overflow: hidden; border: 4px solid white; shadow: 0 4px 12px rgba(0,0,0,0.05);
+            flex-shrink: 0;
         }
+        .doctor-avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
         .doctor-card h3 { font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
         .doctor-specialty { font-size: 0.8rem; color: #0284c7; font-weight: 600; background: #f0f9ff; padding: 3px 10px; border-radius: 999px; display: inline-block; margin-bottom: 10px; }
         .doctor-card p { font-size: 0.8rem; color: #64748b; line-height: 1.5; }
@@ -510,7 +513,11 @@
             @forelse($doctors as $doctor)
             <div class="doctor-card">
                 <div class="doctor-avatar">
-                    {{ mb_substr($doctor->user->full_name ?? 'B', 0, 1) }}
+                    @if($doctor->user->avatar)
+                        <img src="{{ asset('storage/' . $doctor->user->avatar) }}" alt="BS. {{ $doctor->user->full_name }}">
+                    @else
+                        {{ mb_substr($doctor->user->full_name ?? 'B', 0, 1) }}
+                    @endif
                 </div>
                 <h3>BS. {{ $doctor->user->full_name ?? 'Chuyên khoa' }}</h3>
                 <div class="doctor-specialty">{{ $doctor->specialty ?? 'Da Liễu' }}</div>

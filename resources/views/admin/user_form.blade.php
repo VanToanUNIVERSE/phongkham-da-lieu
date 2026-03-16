@@ -1,9 +1,22 @@
 <div class="p-6">
-    <form id="userForm" method="POST" action="{{ route('users.store') }}">
+    <form id="userForm" method="POST" action="{{ route('users.store') }}" enctype="multipart/form-data">
         @csrf
         <input type="hidden" id="formMethod" name="_method" value="POST">
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+            <!-- Avatar -->
+            <div class="md:col-span-2 flex justify-center mb-4">
+                <div class="relative group">
+                    <div class="w-24 h-24 rounded-full bg-blue-50 border-4 border-white shadow-md overflow-hidden flex items-center justify-center">
+                        <img id="avatar_preview" class="w-full h-full object-cover hidden">
+                        <div id="avatar_placeholder" class="text-3xl font-bold text-blue-200 uppercase">?</div>
+                    </div>
+                    <label for="f_avatar" class="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full shadow-lg cursor-pointer hover:bg-blue-700 transition-all">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <input type="file" id="f_avatar" name="avatar" class="hidden" accept="image/*" onchange="previewUserAvatar(this)">
+                    </label>
+                </div>
+            </div>
             <!-- Tên đăng nhập -->
             <div>
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Tên đăng nhập <span class="text-red-500">*</span></label>

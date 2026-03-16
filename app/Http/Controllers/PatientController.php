@@ -138,8 +138,14 @@ class PatientController extends Controller
     ]);
     }
 
-    public function loadData() {
-        $patients = Patient::with('user')->get();
+    public function loadData(Request $request) {
+        $search = $request->query('search');
+        $patients = Patient::with('user')
+            ->when($search, function ($query, $search) {
+                return $query->where('full_name', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
+            })
+            ->get();
         return response()->json([
             'patients' => $patients
         ]);

@@ -9,9 +9,9 @@ const id = document.getElementById('id');
 const message = document.getElementById('message');
 const errors = document.getElementById('errors');
 const patientTable = document.getElementById('patientTable');
-function loadData() {
+function loadData(search = '') {
     console.log("loadData running...");
-    fetch('/patients/loadData')
+    fetch(`/patients/loadData?search=${search}`)
         .then(res => res.json())
         .then(data => {
             let html = `
@@ -198,6 +198,11 @@ function edit(nid) {
 
 function del(nid) {
     showDeleteConfirm(nid, 'mục Bệnh nhân này', '/patients');
+}
+
+function searchPatient() {
+    const search = document.getElementById('patientSearch').value;
+    loadData(search);
 }
 
 loadData();

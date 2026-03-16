@@ -30,24 +30,25 @@
             <p class="text-gray-600">Nhập thông tin bệnh nhân để xem chẩn đoán và đơn thuốc</p>
         </div>
 
-        {{-- Lookup Form --}}
-        <div class="glass rounded-3xl p-8 shadow-2xl border border-white mb-10">
-            <form action="{{ route('public.lookup.search') }}" method="POST" class="flex flex-col md:flex-row gap-6 items-end justify-center">
-                @csrf
-                <div class="w-full md:w-1/2">
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Số điện thoại đăng ký khám</label>
-                    <input type="tel" name="phone" value="{{ old('phone') }}" required
-                           placeholder="Ví dụ: 0901234567"
-                           class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all text-lg text-center font-medium tracking-wide">
-                </div>
-                
-                <button type="submit" class="w-full md:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg shadow-blue-200 transition-all active:scale-[0.98] h-[52px]">
-                    🔍 Tra cứu ngay
-                </button>
-            </form>
-
+        {{-- Lookup Message --}}
+        <div class="glass rounded-3xl p-12 shadow-2xl border border-white mb-10 text-center">
+            <div class="text-6xl mb-6">🔐</div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Tính năng đã thay đổi</h2>
+            <p class="text-gray-600 mb-8 max-w-lg mx-auto leading-relaxed">
+                Để bảo mật thông tin y tế, chức năng tra cứu bằng số điện thoại không còn khả dụng. 
+                Quý khách vui lòng <strong>đăng nhập</strong> vào hệ thống bằng số điện thoại để xem chi tiết hồ sơ bệnh án, đơn thuốc và hóa đơn.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="{{ route('login') }}" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 px-10 rounded-2xl shadow-lg shadow-blue-200 transition-all hover:-translate-y-0.5 active:scale-[0.98]">
+                    Đăng nhập ngay
+                </a>
+                <a href="{{ route('home') }}" class="bg-white hover:bg-gray-50 text-gray-600 font-bold py-3.5 px-10 rounded-2xl border border-gray-200 transition-all">
+                    Về trang chủ
+                </a>
+            </div>
+            
             @if(session('error'))
-                <div class="mt-6 p-4 bg-red-50 border border-red-100 text-red-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3 max-w-2xl mx-auto">
+                <div class="mt-8 p-4 bg-amber-50 border border-amber-100 text-amber-700 rounded-xl text-sm font-medium flex items-center justify-center gap-3">
                     <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/></svg>
                     {{ session('error') }}
                 </div>

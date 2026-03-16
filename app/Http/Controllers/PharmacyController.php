@@ -170,9 +170,12 @@ class PharmacyController extends Controller
     {
         $transactions = MedicineTransaction::with(['medicine', 'user'])
             ->orderBy('created_at', 'desc')
-            ->take(100)
             ->get();
 
-        return response()->json(['transactions' => $transactions]);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['transactions' => $transactions]);
+        }
+
+        return view('admin.pharmacy.transactions', compact('transactions'));
     }
 }
