@@ -18,10 +18,22 @@ class DoctorController extends Controller
 {
     /**
      * Lấy Doctor record của user đang đăng nhập.
+     * Nếu chưa có thì tự động tạo (để tránh lỗi 404).
      */
     private function getDoctor()
     {
-        return Doctor::where('user_id', Auth::id())->firstOrFail();
+        $user = Auth::user();
+        $doctor = Doctor::where('user_id', $user->id)->first();
+
+        if (!$doctor) {
+            $doctor = Doctor::create([
+                'user_id' => $user->id,
+                'specialty' => 'Chưa cập nhật',
+                'is_free' => 1
+            ]);
+        }
+
+        return $doctor;
     }
 
     /**

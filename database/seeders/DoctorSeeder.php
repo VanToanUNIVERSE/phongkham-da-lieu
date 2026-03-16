@@ -15,7 +15,7 @@ class DoctorSeeder extends Seeder
      */
     public function run(): void
     {
-        $doctorRole = Role::where("name", "Bác sĩ")->first();
+        $doctorRole = Role::whereIn('name', ['Bác sĩ', 'Bác sĩ'])->first();
         $doctors = User::where("role_id", $doctorRole->id)->get();
         foreach($doctors as $doctor) {
             Doctor::firstOrCreate(

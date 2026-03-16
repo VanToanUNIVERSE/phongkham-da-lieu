@@ -15,9 +15,9 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminRole = Role::where('name', 'Admin')->first();
-        $doctorRole = Role::where('name', 'Bác sĩ')->first();
-        $MedicalDispenserRole = Role::where('name', 'Nhân viên phát thuốc')->first();
+        $adminRole = Role::whereIn('name', ['Admin', 'admin'])->first();
+        $doctorRole = Role::whereIn('name', ['Bác sĩ', 'Bác sĩ'])->first();
+        $MedicalDispenserRole = Role::whereIn('name', ['Nhân viên phát thuốc', 'Nhân viên phát thuốc'])->first();
         User::firstOrCreate([
             "username" => "admin"
         ],
