@@ -13,23 +13,63 @@ class InvoiceController extends Controller
     {
         $medical_records = MedicalRecord::with(['patient', 'prescription'])->orderBy('id', 'desc')->get();
 
-        // 1. Lấy Doanh thu Tháng này
+        // 1. Doanh thu tháng này vs tháng trước
         $revenueThisMonth = Invoice::where('status', 'paid')
             ->whereMonth('created_at', \Carbon\Carbon::now()->month)
             ->whereYear('created_at', \Carbon\Carbon::now()->year)
             ->sum('total_amount');
 
-        // 2. Lấy Doanh thu Năm nay
+        $revenueLastMonth = Invoice::where('status', 'paid')
+            ->whereMonth('created_at', \Carbon\Carbon::now()->subMonth()->month)
+            ->whereYear('created_at', \Carbon\Carbon::now()->subMonth()->year)
+            ->sum('total_amount');
+
+        // 2. Doanh thu năm nay vs năm ngoái
         $revenueThisYear = Invoice::where('status', 'paid')
             ->whereYear('created_at', \Carbon\Carbon::now()->year)
             ->sum('total_amount');
 
-        // 3. Lấy Doanh thu Hôm nay
+        $revenueLastYear = Invoice::where('status', 'paid')
+            ->whereYear('created_at', \Carbon\Carbon::now()->subYear()->year)
+            ->sum('total_amount');
+
+        // 3. Doanh thu hôm nay vs hôm qua
         $revenueToday = Invoice::where('status', 'paid')
             ->whereDate('created_at', \Carbon\Carbon::today())
             ->sum('total_amount');
 
-        return view('admin.invoice_mg', compact('medical_records', 'revenueThisMonth', 'revenueThisYear', 'revenueToday'));
+        $revenueYesterday = Invoice::where('status', 'paid')
+            ->whereDate('created_at', \Carbon\Carbon::yesterday())
+            ->sum('total_amount');
+
+        // Chart: Doanh thu 14 ngày gần nhất
+        $dailyRevenue = collect(range(13, 0))->map(function ($daysAgo) {
+            $date = \Carbon\Carbon::today()->subDays($daysAgo);
+            return [
+                'date'    => $date->format('d/m'),
+                'revenue' => Invoice::where('status', 'paid')->whereDate('created_at', $date)->sum('total_amount'),
+            ];
+        });
+
+        // Chart: Doanh thu 12 tháng gần nhất
+        $monthlyRevenue = collect(range(11, 0))->map(function ($monthsAgo) {
+            $date = \Carbon\Carbon::now()->subMonths($monthsAgo);
+            return [
+                'month'   => 'Thg ' . $date->format('n/Y'),
+                'revenue' => Invoice::where('status', 'paid')
+                    ->whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year)
+                    ->sum('total_amount'),
+            ];
+        });
+
+        return view('admin.invoice_mg', compact(
+            'medical_records',
+            'revenueThisMonth', 'revenueLastMonth',
+            'revenueThisYear', 'revenueLastYear',
+            'revenueToday', 'revenueYesterday',
+            'dailyRevenue', 'monthlyRevenue'
+        ));
     }
 
     public function loadData(Request $request)

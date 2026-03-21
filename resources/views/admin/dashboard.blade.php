@@ -34,10 +34,10 @@
         </div>
         <div class="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
             <!-- Tìm kiếm người dùng -->
-            <form action="{{ route('users.index') }}" method="GET" class="relative w-full sm:w-64">
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Tìm tên, SĐT, user..." class="pl-10 pr-4 py-2 w-full bg-white border border-gray-300 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
+            <div class="relative w-full sm:w-64">
+                <input type="text" id="searchInput" placeholder="Tìm tên, SĐT, user..." class="pl-10 pr-4 py-2 w-full bg-white border border-gray-300 rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
                 <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            </form>
+            </div>
 
             <!-- Bộ lọc Vai trò -->
             <select id="roleFilter" class="bg-white border text-sm border-gray-300 text-gray-700 py-2 px-3 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors">
@@ -256,33 +256,32 @@
             }
         }
 
-        // Khởi tạo Lọc người dùng theo vai trò
+        // Lọc bảng theo cả tìm kiếm và vai trò
         document.addEventListener('DOMContentLoaded', function() {
-            const roleFilter = document.getElementById('roleFilter');
-            if(roleFilter) {
-                roleFilter.addEventListener('change', function() {
-                    const selectedRole = this.value.toLowerCase().trim().normalize('NFC');
-                    const rows = document.querySelectorAll('#table tbody tr');
+            const searchInput = document.getElementById('searchInput');
+            const roleFilter  = document.getElementById('roleFilter');
 
-                    rows.forEach(row => {
-                        // Cột vai trò là cột thứ 3 (index 2)
-                        const roleCell = row.querySelector('td:nth-child(3)');
-                        if (roleCell) {
-                            const roleText = roleCell.textContent.trim().toLowerCase().normalize('NFC');
-                            
-                            if (selectedRole === 'all') {
-                                row.style.display = '';
-                            } else {
-                                if (roleText === selectedRole || roleText.includes(selectedRole)) {
-                                    row.style.display = '';
-                                } else {
-                                    row.style.display = 'none';
-                                }
-                            }
-                        }
-                    });
+            function filterTable() {
+                const search = (searchInput?.value ?? '').toLowerCase().trim().normalize('NFC');
+                const role   = (roleFilter?.value ?? 'all').toLowerCase().trim().normalize('NFC');
+                const rows   = document.querySelectorAll('#table tbody tr');
+
+                rows.forEach(row => {
+                    const nameCell = row.querySelector('td:nth-child(2)');
+                    const roleCell = row.querySelector('td:nth-child(3)');
+
+                    const nameText = nameCell?.textContent.toLowerCase().normalize('NFC') ?? '';
+                    const roleText = roleCell?.textContent.toLowerCase().normalize('NFC') ?? '';
+
+                    const matchSearch = !search || nameText.includes(search);
+                    const matchRole   = role === 'all' || roleText.includes(role);
+
+                    row.style.display = (matchSearch && matchRole) ? '' : 'none';
                 });
             }
+
+            searchInput?.addEventListener('input', filterTable);
+            roleFilter?.addEventListener('change', filterTable);
         });
 
         function previewUserAvatar(input) {

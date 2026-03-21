@@ -22,6 +22,12 @@
     </div>
 
     {{-- Stats Grid for Admin --}}
+    @php
+        $calcChange = fn($cur, $prev) => $prev > 0 ? round(($cur - $prev) / $prev * 100, 1) : ($cur > 0 ? 100 : 0);
+        $changeMonth = $calcChange($revenueThisMonth, $revenueLastMonth);
+        $changeYear  = $calcChange($revenueThisYear, $revenueLastYear);
+        $changeToday = $calcChange($revenueToday, $revenueYesterday);
+    @endphp
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {{-- Revenue Month --}}
         <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition-all duration-500">
@@ -37,6 +43,10 @@
                     <h3 class="text-3xl font-black text-slate-900 leading-tight">
                         {{ number_format($revenueThisMonth ?? 0, 0, ',', '.') }}<span class="text-xs ml-1 text-slate-400 uppercase tracking-tighter">VNĐ</span>
                     </h3>
+                    <p class="text-xs mt-2 font-semibold {{ $changeMonth >= 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                        {{ $changeMonth >= 0 ? '↑' : '↓' }} {{ abs($changeMonth) }}% so với tháng trước
+                        @if($revenueLastMonth == 0)<span class="text-slate-400 font-normal">(chưa có dữ liệu)</span>@endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -55,6 +65,10 @@
                     <h3 class="text-3xl font-black text-slate-900 leading-tight">
                         {{ number_format($revenueThisYear ?? 0, 0, ',', '.') }}<span class="text-xs ml-1 text-slate-400 uppercase tracking-tighter">VNĐ</span>
                     </h3>
+                    <p class="text-xs mt-2 font-semibold {{ $changeYear >= 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                        {{ $changeYear >= 0 ? '↑' : '↓' }} {{ abs($changeYear) }}% so với năm trước
+                        @if($revenueLastYear == 0)<span class="text-slate-400 font-normal">(chưa có dữ liệu)</span>@endif
+                    </p>
                 </div>
             </div>
         </div>
@@ -73,8 +87,35 @@
                     <h3 class="text-3xl font-black text-slate-900 leading-tight">
                         {{ number_format($revenueToday ?? 0, 0, ',', '.') }}<span class="text-xs ml-1 text-slate-400 uppercase tracking-tighter">VNĐ</span>
                     </h3>
+                    <p class="text-xs mt-2 font-semibold {{ $changeToday >= 0 ? 'text-emerald-600' : 'text-red-500' }}">
+                        {{ $changeToday >= 0 ? '↑' : '↓' }} {{ abs($changeToday) }}% so với hôm qua
+                        @if($revenueYesterday == 0)<span class="text-slate-400 font-normal">(chưa có dữ liệu)</span>@endif
+                    </p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- Chart Section --}}
+    <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 mb-8 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-150">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-lg font-black text-slate-900">Biểu đồ doanh thu</h3>
+                <p class="text-xs text-slate-400 mt-0.5">So sánh doanh thu theo thời gian</p>
+            </div>
+            <div class="flex bg-slate-100 rounded-xl p-1 gap-1">
+                <button id="btnDaily" onclick="switchChart('daily')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-sm">
+                    14 ngày
+                </button>
+                <button id="btnMonthly" onclick="switchChart('monthly')"
+                    class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900">
+                    12 tháng
+                </button>
+            </div>
+        </div>
+        <div style="height: 280px; position: relative;">
+            <canvas id="revenueChart"></canvas>
         </div>
     </div>
 
@@ -243,4 +284,72 @@
 </div>
 
 <script src="{{ asset('js/invoice_mg.js') }}?v={{ time() }}"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    const dailyLabels   = @json($dailyRevenue->pluck('date'));
+    const dailyData     = @json($dailyRevenue->pluck('revenue'));
+    const monthlyLabels = @json($monthlyRevenue->pluck('month'));
+    const monthlyData   = @json($monthlyRevenue->pluck('revenue'));
+
+    const chartConfig = (labels, data, label) => ({
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label,
+                data,
+                backgroundColor: 'rgba(99, 102, 241, 0.15)',
+                borderColor: 'rgba(99, 102, 241, 0.9)',
+                borderWidth: 2,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: ctx => ' ' + Number(ctx.raw).toLocaleString('vi-VN') + ' VNĐ'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,0.04)' },
+                    ticks: {
+                        callback: val => (val >= 1000000 ? (val/1000000).toFixed(1) + 'M' : val.toLocaleString('vi-VN')),
+                        font: { size: 11 }
+                    }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11 } }
+                }
+            }
+        }
+    });
+
+    let currentChart = new Chart(document.getElementById('revenueChart'), chartConfig(dailyLabels, dailyData, 'Doanh thu'));
+
+    function switchChart(type) {
+        currentChart.destroy();
+        const btnDaily   = document.getElementById('btnDaily');
+        const btnMonthly = document.getElementById('btnMonthly');
+
+        if (type === 'daily') {
+            currentChart = new Chart(document.getElementById('revenueChart'), chartConfig(dailyLabels, dailyData, 'Doanh thu theo ngày'));
+            btnDaily.className   = 'px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-sm';
+            btnMonthly.className = 'px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900';
+        } else {
+            currentChart = new Chart(document.getElementById('revenueChart'), chartConfig(monthlyLabels, monthlyData, 'Doanh thu theo tháng'));
+            btnMonthly.className = 'px-4 py-2 rounded-lg text-xs font-bold transition-all bg-white text-slate-900 shadow-sm';
+            btnDaily.className   = 'px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-500 hover:text-slate-900';
+        }
+    }
+</script>
 @endsection
