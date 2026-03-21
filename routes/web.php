@@ -44,6 +44,8 @@ Route::post('/invoices', [InvoiceController::class, 'store'])->name('invoices.st
 Route::get('/tra-cuu', [PublicController::class, 'showLookupForm'])->name('public.lookup');
 Route::post('/tra-cuu', [PublicController::class, 'search'])->name('public.lookup.search');
 
+Route::post('/chat', [\App\Http\Controllers\ChatbotController::class, 'chat'])->name('public.chat');
+
 Route::get('/booked-slots', [\App\Http\Controllers\ReceptionController::class, 'getBookedSlots'])->name('booked.slots');
 Route::get("/login", [AuthController::class, 'showLogin'])->name("login");
 Route::post("/login", [AuthController::class, "login"])->name("postLogin");

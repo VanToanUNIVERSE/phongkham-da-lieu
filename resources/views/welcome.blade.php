@@ -314,6 +314,79 @@
             text-decoration: line-through;
         }
 
+        /* CHATBOT */
+        .chat-widget {
+            position: fixed; bottom: 30px; right: 30px; z-index: 1000;
+        }
+        .chat-toggle {
+            width: 60px; height: 60px; border-radius: 50%;
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: white; border: none; font-size: 24px;
+            box-shadow: 0 4px 16px rgba(14,165,233,0.4);
+            cursor: pointer; transition: all 0.3s;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .chat-toggle:hover { transform: scale(1.05); }
+        .chat-window {
+            position: absolute; bottom: 80px; right: 0;
+            width: 350px; height: 500px; max-height: 80vh;
+            background: white; border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: translateY(20px); opacity: 0; pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chat-window.active {
+            transform: translateY(0); opacity: 1; pointer-events: auto;
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #0ea5e9, #6366f1);
+            color: white; padding: 16px 20px; display: flex;
+            align-items: center; justify-content: space-between;
+        }
+        .chat-header h3 { font-size: 1rem; font-weight: 700; margin: 0; }
+        .chat-header p { font-size: 0.75rem; opacity: 0.9; margin: 2px 0 0 0; }
+        .close-chat { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; }
+        .chat-body {
+            flex: 1; overflow-y: auto; padding: 20px;
+            display: flex; flex-direction: column; gap: 12px;
+            background: #f8fafc;
+        }
+        .chat-msg {
+            max-width: 85%; padding: 10px 14px; border-radius: 14px;
+            font-size: 0.9rem; line-height: 1.5; word-wrap: break-word;
+        }
+        .chat-msg.bot {
+            background: white; color: #333; border: 1px solid #e2e8f0;
+            border-bottom-left-radius: 4px; align-self: flex-start;
+        }
+        .chat-msg.user {
+            background: #0ea5e9; color: white;
+            border-bottom-right-radius: 4px; align-self: flex-end;
+        }
+        .chat-input-area {
+            padding: 14px; background: white; border-top: 1px solid #e2e8f0;
+            display: flex; gap: 8px;
+        }
+        .chat-input-area input {
+            flex: 1; padding: 10px 14px; border: 1px solid #e2e8f0;
+            border-radius: 20px; font-size: 0.9rem; outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input-area input:focus { border-color: #0ea5e9; }
+        .chat-send {
+            background: #0ea5e9; color: white; border: none;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: background 0.2s;
+        }
+        .chat-send:hover { background: #0284c7; }
+        .typing-indicator { display: none; align-self: flex-start; background: white; padding: 8px 12px; border-radius: 14px; border: 1px solid #e2e8f0; }
+        .typing-indicator span { display: inline-block; width: 6px; height: 6px; background: #94a3b8; border-radius: 50%; margin: 0 2px; animation: blink 1.4s infinite both; }
+        .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes blink { 0% { opacity: 0.2; transform: scale(0.8); } 20% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0.2; transform: scale(0.8); } }
+
         @media (max-width: 900px) {
             .hero-inner, .booking-grid, .contact-grid { grid-template-columns: 1fr; }
             .features-grid, .services-grid { grid-template-columns: 1fr 1fr; }
@@ -672,6 +745,34 @@
        <a href="{{ route('login') }}">Đăng nhập hệ thống</a></p>
 </footer>
 
+{{-- CHAT WIDGET --}}
+<div class="chat-widget">
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div>
+                <h3>Trợ lý Da Liễu AI</h3>
+                <p>Luôn sẵn sàng hỗ trợ bạn</p>
+            </div>
+            <button class="close-chat" onclick="toggleChat()">✖</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <div class="chat-msg bot">Xin chào! Em là trợ lý AI của Phòng Khám Da Liễu. Anh/chị cần em hỗ trợ gọi đặt lịch hay hỏi thông tin gì ạ?</div>
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Nhập câu hỏi..." onkeypress="handleChatEnter(event)">
+            <button class="chat-send" onclick="sendChatMessage()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+            </button>
+        </div>
+    </div>
+    <button class="chat-toggle" onclick="toggleChat()">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="28" height="28"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
+    </button>
+</div>
+
 <script>
 const CSRF = document.querySelector('meta[name="csrf-token"]').content;
 const ALL_SLOTS = ['08:00', '08:30', '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'];
@@ -856,6 +957,68 @@ document.getElementById('b_date').value = today;
 // Trigger update for pre-filled values
 updateAvailability('q');
 updateAvailability('b');
+
+// Chatbot Logic
+let chatHistory = [];
+
+function toggleChat() {
+    document.getElementById('chatWindow').classList.toggle('active');
+}
+
+function handleChatEnter(e) {
+    if (e.key === 'Enter') sendChatMessage();
+}
+
+async function sendChatMessage() {
+    const input = document.getElementById('chatInput');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    appendChatMsg('user', msg);
+    input.value = '';
+    
+    // Save to history
+    chatHistory.push({ role: 'user', parts: [{ text: msg }] });
+    
+    const indicator = document.getElementById('typingIndicator');
+    const chatBody = document.getElementById('chatBody');
+    chatBody.appendChild(indicator); // Move to bottom
+    indicator.style.display = 'inline-block';
+    chatBody.scrollTop = chatBody.scrollHeight;
+
+    try {
+        const res = await fetch("{{ route('public.chat') }}", {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+            body: JSON.stringify({ history: chatHistory })
+        }).then(r => r.json());
+
+        indicator.style.display = 'none';
+        
+        if (res.status === 'success') {
+            appendChatMsg('bot', res.reply);
+            chatHistory.push({ role: 'model', parts: [{ text: res.reply }] });
+        } else {
+            appendChatMsg('bot', res.message || 'Xin lỗi, hệ thống AI đang bận. Vui lòng thử lại sau ạ.');
+        }
+    } catch (e) {
+        indicator.style.display = 'none';
+        appendChatMsg('bot', 'Lỗi kết nối. Vui lòng kiểm tra lại mạng. Chi tiết: ' + e.message);
+    }
+}
+
+function appendChatMsg(role, text) {
+    const chatBody = document.getElementById('chatBody');
+    const div = document.createElement('div');
+    div.className = `chat-msg ${role}`;
+    // Basic formatting for Markdown bold/italics etc can be added, but textContent prevents XSS
+    // Replace \n with <br> for basic multiline
+    div.innerHTML = text.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+    
+    const indicator = document.getElementById('typingIndicator');
+    chatBody.insertBefore(div, indicator);
+    chatBody.scrollTop = chatBody.scrollHeight;
+}
 </script>
 </body>
 </html>
