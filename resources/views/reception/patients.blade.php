@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý bệnh nhân')
+
 @section('content')
 <div class="animate-in fade-in duration-700">
 

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Trang chủ')
+
 @section('content')
 <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between">
     <div>

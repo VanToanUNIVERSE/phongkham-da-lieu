@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý hóa đơn')
+
 @section('content')
 <div class="animate-in fade-in duration-700">
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">

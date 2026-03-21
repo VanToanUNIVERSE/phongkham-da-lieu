@@ -3,12 +3,12 @@
         <!-- Sidebar Header -->
         <div class="px-6 py-8">
              <div class="flex items-center gap-3 mb-2">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg shadow-white/10 p-1">
+                    <img src="{{ asset('images/logophongkham.png') }}" alt="Logo" class="w-full h-full object-cover rounded-full">
                 </div>
                 <div>
-                    <span class="text-white text-lg font-bold tracking-tight block">DAVI CLINIC</span>
-                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Management System</span>
+                    <span class="text-white text-xl font-bold tracking-tight block">Phòng khám DaVI</span>
+                    <span class="text-[10px] text-slate-500 font-bold uppercase tracking-widest">Hệ thống quản lý</span>
                 </div>
              </div>
         </div>

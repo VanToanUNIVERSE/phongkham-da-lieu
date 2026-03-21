@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý hồ sơ bệnh án')
+
 @section('content')
 
 {{-- Modal Tạo / Sửa Hồ sơ --}}

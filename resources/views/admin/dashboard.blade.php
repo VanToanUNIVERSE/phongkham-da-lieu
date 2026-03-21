@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý người dùng')
+
 @section('content')
     {{-- MODAL --}}
     <div id="modal" class="fixed inset-0 z-50 hidden overflow-y-auto w-full" aria-labelledby="modal-title" role="dialog" aria-modal="true">

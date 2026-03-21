@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý đơn thuốc')
+
 @section('content')
 
 {{-- Modal xem chi tiết đơn thuốc --}}

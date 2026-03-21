@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>
         @if (Auth::check())
-            Admin - {{ Auth::user()->role->name }}
+            {{ Auth::user()->role->name }} - @yield('pageTitle', 'Dashboard')
         @else
             Phòng khám Da liễu
         @endif

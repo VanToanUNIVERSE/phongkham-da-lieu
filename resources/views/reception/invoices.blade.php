@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý hóa đơn')
+
 @section('content')
 
 {{-- ===== SLIDE PANEL (Invoice Detail / Create) ===== --}}

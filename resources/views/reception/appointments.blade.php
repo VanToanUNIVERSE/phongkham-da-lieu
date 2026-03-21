@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Tiếp nhận lịch khám')
+
 @section('content')
 
 {{-- ===== SLIDE PANEL (Tiếp nhận all-in-one) ===== --}}

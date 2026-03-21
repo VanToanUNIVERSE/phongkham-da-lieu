@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Lịch khám hôm nay')
+
 @section('content')
 
 {{-- ===== SLIDE PANEL (khám bệnh all-in-one) ===== --}}

@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Thống kê doanh thu')
+
 @section('title', 'BÁO CÁO TOÀN DIỆN')
 
 @section('content')

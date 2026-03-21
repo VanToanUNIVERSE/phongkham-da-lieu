@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Lịch sử xuất nhập kho')
+
 @section('content')
 <div class="animate-in fade-in duration-700">
     {{-- Header --}}

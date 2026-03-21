@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Kho thuốc')
+
 @section('content')
 
 {{-- Import modal --}}

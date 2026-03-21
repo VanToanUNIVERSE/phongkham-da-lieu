@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Phát thuốc')
+
 @section('content')
 
 {{-- ===== SLIDE PANEL (Prescription Detail) ===== --}}

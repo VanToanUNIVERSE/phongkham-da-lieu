@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Quản lý đơn thuốc')
+
 @section('content')
     <div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
         <div>

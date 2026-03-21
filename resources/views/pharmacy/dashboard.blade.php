@@ -1,5 +1,7 @@
 @extends('layouts.app')
 
+@section('pageTitle', 'Trang chủ')
+
 @section('content')
 <div class="mb-8">
     <h2 class="text-2xl font-black text-gray-900">Trang chủ — Dược sĩ</h2>
