@@ -267,11 +267,28 @@ class ReceptionController extends Controller
                 $patient->update(['full_name' => $request->full_name]);
             }
 
-            // Nếu không chọn bác sĩ cụ thể, lấy bác sĩ đầu tiên
-            $doctorId = $request->doctor_id ?? Doctor::first()?->id;
+            // Nếu không chọn bác sĩ cụ thể, tự động xếp cho bác sĩ RẢNH nhất trong giờ đó
+            $doctorId = $request->doctor_id;
+            
+            if (!$doctorId) {
+                // Lấy danh sách ID các bác sĩ ĐÃ CÓ LỊCH vào ngày & giờ này
+                $busyDoctorIds = Appointment::whereDate('date', $request->date)
+                    ->where('time', $request->time)
+                    ->whereIn('status', ['pending', 'inprocess', 'complete'])
+                    ->pluck('doctor_id')
+                    ->toArray();
+
+                // Tìm bác sĩ CHƯA CÓ LỊCH
+                $freeDoctor = Doctor::whereNotIn('id', $busyDoctorIds)->first();
+
+                $doctorId = $freeDoctor?->id;
+            }
 
             if (!$doctorId) {
-                return response()->json(['status' => 'fail', 'message' => 'Hiện chưa có bác sĩ nào trong hệ thống.'], 422);
+                return response()->json([
+                    'status' => 'fail', 
+                    'message' => 'Rất tiếc, hiện tại tất cả bác sĩ đều đã kín lịch vào giờ này, vui lòng chọn giờ khác!'
+                ], 422);
             }
 
             $apt = Appointment::create([
@@ -321,20 +338,44 @@ class ReceptionController extends Controller
             'doctor_id' => 'nullable',
             'date'      => 'required|date',
         ]);
-        
-        if (!$request->doctor_id) {
+
+        $allSlots = ['08:00','08:30','09:00','09:30','10:00','10:30','11:00','11:30',
+                     '13:30','14:00','14:30','15:00','15:30','16:00','16:30'];
+
+        if ($request->doctor_id) {
+            // Specific doctor: return their booked slots
+            $bookedTimes = Appointment::where('doctor_id', $request->doctor_id)
+                ->whereDate('date', $request->date)
+                ->whereIn('status', ['pending', 'inprocess', 'complete'])
+                ->pluck('time')
+                ->map(fn($t) => Carbon::parse($t)->format('H:i'))
+                ->values()->toArray();
+
+            return response()->json(['booked_times' => $bookedTimes]);
+        }
+
+        // "Bất kỳ" — find slots where ALL doctors are booked at that time
+        $doctorIds = Doctor::pluck('id');
+        $totalDoctors = $doctorIds->count();
+
+        if ($totalDoctors === 0) {
             return response()->json(['booked_times' => []]);
         }
 
-        $bookedTimes = Appointment::where('doctor_id', $request->doctor_id)
+        // Count how many doctors are booked per slot
+        $bookedCounts = Appointment::whereIn('doctor_id', $doctorIds)
             ->whereDate('date', $request->date)
             ->whereIn('status', ['pending', 'inprocess', 'complete'])
-            ->pluck('time')
-            ->map(function($time) {
-                return Carbon::parse($time)->format('H:i');
-            });
+            ->get()
+            ->groupBy(fn($a) => Carbon::parse($a->time)->format('H:i'))
+            ->map(fn($group) => $group->unique('doctor_id')->count());
 
-        return response()->json(['booked_times' => $bookedTimes]);
+        // Only mark a slot as "booked" if ALL doctors are occupied
+        $fullyBookedSlots = collect($allSlots)->filter(
+            fn($slot) => ($bookedCounts[$slot] ?? 0) >= $totalDoctors
+        )->values()->toArray();
+
+        return response()->json(['booked_times' => $fullyBookedSlots]);
     }
 
     /**

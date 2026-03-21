@@ -13,7 +13,13 @@
             <p class="text-sm text-gray-500 mb-5">Tồn kho sẽ được cập nhật ngay sau khi xác nhận.</p>
 
             <div class="mb-4">
-                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1.5">Tên thuốc <span class="text-red-500">*</span></label>
+                <div class="flex justify-between items-center mb-1.5">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-widest">Tên thuốc <span class="text-red-500">*</span></label>
+                    <a href="{{ route('medicines.index') }}" class="text-xs font-bold text-violet-600 hover:text-violet-700 hover:underline flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+                        Tạo thuốc mới
+                    </a>
+                </div>
                 <select id="importMedicineId" class="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:border-violet-500 focus:ring-2 focus:ring-violet-100 outline-none">
                     <option value="">-- Chọn thuốc --</option>
                 </select>
@@ -49,7 +55,11 @@
             <input type="text" id="searchInput" placeholder="Tìm tên thuốc..." oninput="loadInventory()"
                 class="border-none bg-transparent text-sm outline-none w-48">
         </div>
-        <button onclick="openImport()" class="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-black rounded-xl transition-all active:scale-95 flex items-center gap-2">
+        <a href="{{ route('medicines.index') }}" class="px-5 py-2.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-bold rounded-xl transition-all active:scale-95 flex items-center gap-2 text-sm shadow-sm md:flex hidden">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            Quản lý Kho gốc
+        </a>
+        <button onclick="openImport()" class="px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white font-black rounded-xl transition-all active:scale-95 flex items-center gap-2 text-sm shadow-md shadow-violet-500/20">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Nhập kho
         </button>

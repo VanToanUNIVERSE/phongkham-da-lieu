@@ -798,15 +798,16 @@ async function updateAvailability(section) {
     const date = document.getElementById(section + '_date').value;
     const container = document.getElementById(section + '_time_slots');
 
-    if (!doctorId || !date) {
-        container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 10px;">Vui lòng chọn bác sĩ và ngày khám để xem lịch trống.</p>';
+    if (!date) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 10px;">Vui lời chọn ngày khám để xem lịch trống.</p>';
         return;
     }
 
     container.innerHTML = '<p style="font-size: 0.8rem; color: #94a3b8; grid-column: 1/-1; text-align: center; padding: 10px;">⏳ Đang tải...</p>';
 
     try {
-        const res = await fetch(`{{ route('booked.slots') }}?doctor_id=${doctorId}&date=${date}`).then(r => r.json());
+        const url = `{{ route('booked.slots') }}?date=${date}` + (doctorId ? `&doctor_id=${doctorId}` : '');
+        const res = await fetch(url).then(r => r.json());
         const booked = res.booked_times || [];
         renderSlots(section, booked);
     } catch (e) {
