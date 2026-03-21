@@ -1,4 +1,4 @@
-﻿const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
 const medicines = window.medicines;
 
@@ -110,9 +110,9 @@ function addMedicineRow(medicines) {
 }
 
 
-function loadData() {
+function loadData(search = '') {
     let html = '';
-    fetch('/prescriptions/loadData')
+    fetch(`/prescriptions/loadData?search=${search}`)
         .then(res => res.json())
         .then(data => {
             html += `
@@ -137,11 +137,15 @@ function loadData() {
         <tr id="row-${m.id}" class="hover:bg-gray-50/50 transition-colors">
             <td class="py-3 px-6 font-medium text-gray-900">#${m.id}</td>
             <td class="py-3 px-6"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-sm font-medium">BA-${m.medical_record_id}</span></td>
-            <td class="py-3 px-6 flex items-center gap-2">
-                <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-                    ${m.user.full_name.substring(0, 1)}
-                </div>
-                ${m.user.full_name}
+            <td class="py-3 px-6">
+                ${m.user ? `
+                    <div class="flex items-center gap-2">
+                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+                            ${m.user.full_name.substring(0, 1)}
+                        </div>
+                        <span>${m.user.full_name}</span>
+                    </div>
+                ` : `<span class="text-gray-400 italic">Chưa phân công</span>`}
             </td>
             <td class="py-3 px-6 truncate max-w-xs" title="${m.content}">${m.content}</td>
             <td class="py-3 px-6">${badge}</td>
@@ -344,6 +348,9 @@ function del(nid) {
     showDeleteConfirm(nid, 'mục Đơn thuốc này', '/prescriptions');
 }
 
+function searchPrescription() {
+    const search = document.getElementById('prescriptionSearch').value;
+    loadData(search);
+}
 
-
-
+loadData();

@@ -43,7 +43,7 @@ class PrescriptionController extends Controller
 
         $data = $request->validate([
             'medical_record_id' => 'required|exists:medical_records,id',
-            'dispensed_by' => 'required|exists:users,id',
+            'dispensed_by' => 'nullable|exists:users,id',
             'dispense_status' => 'required',
             'content' => 'required',
             'items' => 'required|array|min:1',
@@ -132,7 +132,7 @@ class PrescriptionController extends Controller
 
         $data = $request->validate([
             'medical_record_id' => 'required|exists:medical_records,id',
-            'dispensed_by' => 'required|exists:users,id',
+            'dispensed_by' => 'nullable|exists:users,id',
             'dispense_status' => 'required',
             'content' => 'nullable',
             'items' => 'required|array|min:1',
@@ -201,16 +201,19 @@ class PrescriptionController extends Controller
         ]);
     }
 
-    public function loadData() {
-        $prescriptions = Prescription::with('user')->get();
-        $medicines = Medicine::all();
-        $medical_records = MedicalRecord::all();
-        $users = User::all();
+    public function loadData(Request $request) {
+        $search = $request->query('search');
+        $prescriptions = Prescription::with(['medical_record.patient', 'medical_record.doctor.user', 'user'])
+            ->when($search, function ($query, $search) {
+                return $query->whereHas('medical_record.patient', function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%");
+                })->orWhereHas('medical_record.doctor.user', function ($q) use ($search) {
+                    $q->where('full_name', 'like', "%{$search}%");
+                });
+            })
+            ->get();
         return response()->json([
-            'prescriptions' => $prescriptions,
-            'medicines' => $medicines,
-            'medical_records' => $medical_records,
-            'users' => $users
+            'prescriptions' => $prescriptions
         ]);
     }
 }

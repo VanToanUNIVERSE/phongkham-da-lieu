@@ -58,8 +58,15 @@ class ReceptionController extends Controller
     public function loadAppointments(Request $request)
     {
         $date = $request->date ?? today()->toDateString();
+        $search = $request->query('search');
+
         $appointments = Appointment::with(['patient', 'doctor.user'])
             ->whereDate('date', $date)
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('patient', function($q) use ($search) {
+                    $q->where('full_name', 'like', "%$search%");
+                });
+            })
             ->orderBy('time', 'asc')
             ->get();
         return response()->json(['appointments' => $appointments]);

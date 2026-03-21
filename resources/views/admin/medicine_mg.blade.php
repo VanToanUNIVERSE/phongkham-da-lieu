@@ -9,12 +9,18 @@
             <h2 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">Quản lý Thuốc</h2>
             <p class="text-slate-500 text-sm mt-1 font-medium italic">Danh sách kho thuốc và vật tư y tế</p>
         </div>
-        <button onclick="openCreate()" class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-2xl shadow-lg font-bold transition-all active:scale-95 flex items-center gap-2 uppercase text-xs tracking-widest whitespace-nowrap">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a4.978 4.978 0 00-1.464-3.536 5.002 5.002 0 00-7.072 0L3.928 8.001a5.002 5.002 0 000 7.071 5.002 5.002 0 007.072 0l3.535-3.536A4.978 4.978 0 0016 8zM8.5 15.5l7-7" />
-            </svg>
-            Thêm Thuốc Mới
-        </button>
+        <div class="flex items-center gap-3">
+            <div class="relative group">
+                <input type="text" id="medicineSearch" onkeyup="searchMedicine()" placeholder="Tìm tên thuốc..." class="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-slate-900/10 transition-all outline-none w-64 shadow-sm">
+                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <button onclick="openCreate()" class="bg-slate-900 hover:bg-black text-white px-6 py-3 rounded-2xl shadow-lg font-bold transition-all active:scale-95 flex items-center gap-2 uppercase text-xs tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a4.978 4.978 0 00-1.464-3.536 5.002 5.002 0 00-7.072 0L3.928 8.001a5.002 5.002 0 000 7.071 5.002 5.002 0 007.072 0l3.535-3.536A4.978 4.978 0 0016 8zM8.5 15.5l7-7" />
+                </svg>
+                Thêm Thuốc Mới
+            </button>
+        </div>
     </div>
 
     {{-- MODAL COMPONENT --}}

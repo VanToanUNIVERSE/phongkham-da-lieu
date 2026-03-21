@@ -82,10 +82,17 @@
         <h2 class="text-2xl font-bold text-gray-800">Hồ sơ khám bệnh</h2>
         <p class="text-gray-500 text-sm mt-1">Quản lý hồ sơ bệnh án do BS. {{ auth()->user()->full_name }} tạo</p>
     </div>
-    <button onclick="openCreate()" class="mt-4 md:mt-0 bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
-        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-        Tạo hồ sơ mới
-    </button>
+    <div class="mt-4 md:mt-0 flex items-center gap-3">
+        <div class="relative group">
+            <input type="text" id="recordSearch" placeholder="Tìm tên, chẩn đoán..." onkeyup="debounceSearch()"
+                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-teal-500/10 focus:border-teal-500 transition-all outline-none w-64">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-teal-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+        <button onclick="openCreate()" class="bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+            Tạo hồ sơ mới
+        </button>
+    </div>
 </div>
 
 {{-- Table --}}
@@ -143,8 +150,15 @@ document.getElementById('appointmentId').addEventListener('change', function() {
 });
 
 // --- CRUD ---
+let searchTimeout = null;
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadData, 500);
+}
+
 function loadData() {
-    fetch('{{ route("doctor.medical_records.load") }}')
+    const search = document.getElementById('recordSearch').value;
+    fetch(`{{ route("doctor.medical_records.load") }}?search=${search}`)
     .then(r => r.json())
     .then(data => {
         let html = `

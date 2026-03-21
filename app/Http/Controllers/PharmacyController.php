@@ -17,6 +17,7 @@ class PharmacyController extends Controller
     {
         $pendingCount  = Prescription::whereIn('dispense_status', [null, 'pending'])
             ->whereHas('medical_record.invoice', fn($q) => $q->where('status', 'paid'))
+            ->whereDate('created_at', today())
             ->count();
 
         $dispensedToday = Prescription::where('dispense_status', 'dispensed')

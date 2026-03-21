@@ -1,12 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="mb-6 flex justify-between items-center">
-        <h2 class="text-2xl font-bold text-gray-800">Quản lý Đơn thuốc</h2>
-        <button onclick="openCreate()" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-            Thêm đơn thuốc
-        </button>
+    <div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-6">
+        <div>
+            <h2 class="text-3xl font-black text-slate-900 tracking-tighter uppercase">Quản lý Đơn thuốc</h2>
+            <p class="text-slate-500 text-sm mt-1 font-medium italic">Danh sách các đơn thuốc đã kê cho bệnh nhân</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="relative group">
+                <input type="text" id="prescriptionSearch" onkeyup="searchPrescription()" placeholder="Tìm bệnh nhân, bác sĩ..." class="pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-semibold text-slate-700 focus:ring-2 focus:ring-slate-900/10 transition-all outline-none w-64 shadow-sm">
+                <svg class="w-5 h-5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            </div>
+            <button onclick="openCreate()" class="bg-blue-600 hover:bg-blue-700 text-white font-black py-3 px-6 rounded-2xl shadow-lg transition-all active:scale-95 flex items-center gap-2 uppercase text-xs tracking-widest whitespace-nowrap">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" /></svg>
+                Thêm đơn thuốc
+            </button>
+        </div>
     </div>
 
     <!-- Table Section -->
@@ -28,11 +37,17 @@
                         <tr id="row-{{ $p->id }}" class="hover:bg-gray-50/50 transition-colors">
                             <td class="py-3 px-6 font-medium text-gray-900">#{{ $p->id }}</td>
                             <td class="py-3 px-6"><span class="bg-indigo-50 text-indigo-700 px-2 py-1 rounded text-sm font-medium">BA-{{ $p->medical_record_id }}</span></td>
-                            <td class="py-3 px-6 flex items-center gap-2">
-                                <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
-                                    {{ substr($p->user->full_name, 0, 1) }}
-                                </div>
-                                {{ $p->user->full_name }}
+                            <td class="py-3 px-6">
+                                @if($p->user)
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">
+                                            {{ mb_substr($p->user->full_name, 0, 1, 'UTF-8') }}
+                                        </div>
+                                        <span>{{ $p->user->full_name }}</span>
+                                    </div>
+                                @else
+                                    <span class="text-gray-400 italic">Chưa phân công</span>
+                                @endif
                             </td>
                             <td class="py-3 px-6 truncate max-w-xs" title="{{ $p->content }}">{{ $p->content }}</td>
                             <td class="py-3 px-6">

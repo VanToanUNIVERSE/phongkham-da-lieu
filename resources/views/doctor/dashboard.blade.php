@@ -14,7 +14,7 @@
 </div>
 
 {{-- Stats Grid --}}
-<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+<div class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-3 gap-6 mb-8">
     {{-- Card 1 --}}
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex items-center transition-transform hover:-translate-y-1 duration-300">
         <div class="p-4 bg-blue-50 text-blue-600 rounded-lg mr-4">
@@ -48,19 +48,6 @@
         </div>
     </div>
 
-    {{-- Quick Actions --}}
-    <div class="bg-gradient-to-br from-teal-600 to-emerald-700 rounded-xl shadow-sm p-6 text-white flex flex-col justify-center relative overflow-hidden">
-        <svg class="absolute -right-4 -bottom-4 w-32 h-32 text-white opacity-10" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-        <h3 class="text-lg font-bold mb-2 relative z-10">Thao tác nhanh</h3>
-        <div class="flex gap-2 relative z-10 flex-wrap">
-            <a href="{{ route('doctor.appointments') }}" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded text-sm transition-colors text-white backdrop-blur">
-                Lịch khám
-            </a>
-            <a href="{{ route('doctor.medical_records') }}" class="bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded text-sm transition-colors text-white backdrop-blur">
-                Tạo hồ sơ
-            </a>
-        </div>
-    </div>
 </div>
 
 {{-- Lịch hôm nay --}}

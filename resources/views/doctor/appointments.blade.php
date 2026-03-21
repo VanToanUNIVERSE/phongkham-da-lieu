@@ -600,7 +600,6 @@ function savePrescription() {
         headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
             medical_record_id: currentRecordId,
-            dispensed_by: {{ auth()->id() }},
             dispense_status: 'pending',
             content: document.getElementById('prescContent').value,
             items

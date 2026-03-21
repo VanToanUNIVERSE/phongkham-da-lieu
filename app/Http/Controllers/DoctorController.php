@@ -89,12 +89,22 @@ class DoctorController extends Controller
     /**
      * API: Load danh sách lịch hẹn của bác sĩ đang đăng nhập.
      */
-    public function loadAppointments()
+    public function loadAppointments(Request $request)
     {
         $doctor = $this->getDoctor();
+        $search = $request->query('search');
+        $date = $request->query('date');
 
         $appointments = Appointment::with(['patient'])
             ->where('doctor_id', $doctor->id)
+            ->when($date, function($query) use ($date) {
+                $query->whereDate('date', $date);
+            })
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('patient', function($q) use ($search) {
+                    $q->where('full_name', 'like', "%$search%");
+                });
+            })
             ->orderByRaw("FIELD(status, 'pending', 'inprocess', 'complete')")
             ->orderBy('date', 'desc')
             ->orderBy('time', 'asc')
@@ -139,12 +149,18 @@ class DoctorController extends Controller
     /**
      * API: Load danh sách hồ sơ của bác sĩ đang đăng nhập.
      */
-    public function loadMedicalRecords()
+    public function loadMedicalRecords(Request $request)
     {
         $doctor = $this->getDoctor();
+        $search = $request->query('search');
 
         $records = MedicalRecord::with(['patient', 'appointment'])
             ->where('doctor_id', $doctor->id)
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('patient', function($q) use ($search) {
+                    $q->where('full_name', 'like', "%$search%");
+                })->orWhere('diagnosis', 'like', "%$search%");
+            })
             ->orderByDesc('created_at')
             ->get();
 
@@ -225,15 +241,21 @@ class DoctorController extends Controller
     /**
      * API: Load đơn thuốc của bác sĩ (qua hồ sơ của bác sĩ này).
      */
-    public function loadPrescriptions()
+    public function loadPrescriptions(Request $request)
     {
         $doctor = $this->getDoctor();
+        $search = $request->query('search');
 
         // Lấy tất cả medical_record_id của bác sĩ này
         $recordIds = MedicalRecord::where('doctor_id', $doctor->id)->pluck('id');
 
         $prescriptions = Prescription::with(['medical_record.patient', 'items.medicine'])
             ->whereIn('medical_record_id', $recordIds)
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('medical_record.patient', function($q) use ($search) {
+                    $q->where('full_name', 'like', "%$search%");
+                });
+            })
             ->orderByDesc('created_at')
             ->get();
 

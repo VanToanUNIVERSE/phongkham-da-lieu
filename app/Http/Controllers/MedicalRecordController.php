@@ -126,17 +126,22 @@ class MedicalRecordController extends Controller
         ]);
     }
 
-    public function loadData() {
-        $medical_records = MedicalRecord::with(['doctor.user', 'patient'])->get();
-        $doctors = Doctor::with('user')->get();
-        $patients = Patient::all();
-        $appointments = Appointment::all();
+    public function loadData(Request $request) {
+        $search = $request->query('search');
+        $medical_records = MedicalRecord::with(['doctor.user', 'patient'])
+            ->when($search, function ($query, $search) {
+                return $query->where('diagnosis', 'like', "%{$search}%")
+                    ->orWhereHas('patient', function ($q) use ($search) {
+                        $q->where('full_name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('doctor.user', function ($q) use ($search) {
+                        $q->where('full_name', 'like', "%{$search}%");
+                    });
+            })
+            ->get();
         return response()->json([
             'status' => 'success',
-            'medical_records' => $medical_records,
-            'doctors' => $doctors,
-            'patients' => $patients,
-            'appointments' => $appointments
+            'medical_records' => $medical_records
         ]);
     }
 }

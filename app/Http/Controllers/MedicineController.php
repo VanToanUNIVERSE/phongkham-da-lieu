@@ -121,8 +121,11 @@ class MedicineController extends Controller
         ]);
     }
 
-    public function loadData() {
-        $medicines = Medicine::all();
+    public function loadData(Request $request) {
+        $search = $request->query('search');
+        $medicines = Medicine::when($search, function ($query, $search) {
+            return $query->where('name', 'like', "%{$search}%");
+        })->get();
         return response()->json([
             'medicines' => $medicines
         ]);

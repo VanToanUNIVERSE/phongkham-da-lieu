@@ -68,19 +68,11 @@
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between mt-6">
-                        <div class="flex items-center">
-                            <input id="remember_me" name="remember" type="checkbox" class="h-4 w-4 bg-white border-gray-300 rounded text-blue-600 focus:ring-blue-500 transition-colors cursor-pointer">
-                            <label for="remember_me" class="ml-2 block text-sm text-gray-600 cursor-pointer">
-                                Ghi nhớ đăng nhập
-                            </label>
-                        </div>
-
-                        <div class="text-sm">
-                            <a href="#" class="font-semibold text-blue-600 hover:text-blue-500 transition-colors">
-                                Quên mật khẩu?
-                            </a>
-                        </div>
+                    <div class="flex items-center mt-6">
+                        <input id="remember_me" name="remember" type="checkbox" class="h-4 w-4 bg-white border-gray-300 rounded text-blue-600 focus:ring-blue-500 transition-colors cursor-pointer">
+                        <label for="remember_me" class="ml-2 block text-sm text-gray-600 cursor-pointer">
+                            Ghi nhớ đăng nhập
+                        </label>
                     </div>
 
                     <div class="pt-4 pb-2">

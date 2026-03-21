@@ -161,7 +161,12 @@ function loadTransactions() {
     const tbody = document.getElementById('txBody');
     tbody.innerHTML = '<tr><td colspan="6" class="py-10 text-center text-gray-300 text-sm font-bold animate-pulse">Đang tải...</td></tr>';
 
-    fetch(`{{ route('pharmacy.transactions') }}`)
+    fetch(`{{ route('pharmacy.transactions') }}`, {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
     .then(r => r.json())
     .then(data => {
         const txs = data.transactions;

@@ -60,8 +60,8 @@ function openCreate() {
     message.innerHTML = "";
 }
 
-function loadData() {
-    fetch('/medical_records/loadData')
+function loadData(search = '') {
+    fetch(`/medical_records/loadData?search=${search}`)
     .then(res => res.json())
     .then(data => {
         let html = `
@@ -217,6 +217,11 @@ function del(nid) {
     showDeleteConfirm(nid, 'Hồ sơ khám này', '/medical_records');
 }
 
+
+function searchMedicalRecord() {
+    const search = document.getElementById('medicalRecordSearch').value;
+    loadData(search);
+}
 
 loadData();
 

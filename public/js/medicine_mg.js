@@ -1,4 +1,4 @@
-﻿const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 const modal = document.getElementById('modal');
 
 const id = document.getElementById('id');
@@ -55,9 +55,9 @@ function openCreate() {
     message.innerHTML = "";
 }
 
-function loadData() {
+function loadData(search = '') {
     let html = '';
-    fetch('/medicines/loadData')
+    fetch(`/medicines/loadData?search=${search}`)
         .then(res => res.json())
         .then(data => {
                 html += `
@@ -210,7 +210,9 @@ function del(nid) {
     showDeleteConfirm(nid, 'mục Thuốc này', '/medicines');
 }
 
+function searchMedicine() {
+    const search = document.getElementById('medicineSearch').value;
+    loadData(search);
+}
+
 loadData();
-
-
-

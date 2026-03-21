@@ -20,76 +20,20 @@
     </div>
 </div>
 
-{{-- Modal tạo đơn thuốc mới --}}
-<div id="createModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-modal="true">
-    <div id="createBackdrop" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm transition-opacity duration-300 opacity-0"></div>
-    <div class="flex items-center justify-center min-h-screen px-4 py-8">
-        <div id="createPanel" class="relative bg-white rounded-xl shadow-2xl w-full max-w-3xl transform transition-all duration-300 opacity-0 translate-y-4">
-            <div class="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center rounded-t-xl">
-                <h3 class="text-xl font-bold text-gray-800">Tạo đơn thuốc mới</h3>
-                <button onclick="closeCreate()" class="text-gray-400 hover:text-red-500 p-1 rounded-md transition-colors">
-                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>
-            </div>
-            <div class="p-6 space-y-4">
-                {{-- Hồ sơ --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Hồ sơ khám <span class="text-red-500">*</span></label>
-                    <select id="medicalRecordId" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:border-blue-500 focus:ring-blue-500">
-                        <option value="" disabled selected>-- Chọn hồ sơ khám --</option>
-                        @foreach($myRecords as $rec)
-                            <option value="{{ $rec->id }}">
-                                #{{ $rec->id }} — {{ $rec->patient->full_name ?? 'N/A' }}
-                                @if($rec->appointment) | {{ $rec->appointment->date }} {{ substr($rec->appointment->time ?? '', 0, 5) }} @endif
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                {{-- Nội dung / ghi chú --}}
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Ghi chú / Hướng dẫn dùng thuốc</label>
-                    <textarea id="prescContent" rows="2" placeholder="Ví dụ: Uống sau bữa ăn, dùng trong 7 ngày..."
-                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 resize-none"></textarea>
-                </div>
-
-                {{-- Danh sách thuốc --}}
-                <div>
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="text-sm font-semibold text-gray-700">Danh sách thuốc <span class="text-red-500">*</span></label>
-                        <button onclick="addMedicineRow()" class="text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1 rounded-lg transition-colors flex items-center gap-1">
-                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            Thêm thuốc
-                        </button>
-                    </div>
-                    <div id="medicineRows" class="space-y-2">
-                        {{-- rows added by JS --}}
-                    </div>
-                </div>
-
-                <p id="createMessage" class="text-sm font-medium text-center"></p>
-            </div>
-            <div class="bg-gray-50 px-6 py-4 border-t border-gray-100 flex justify-end gap-3 rounded-b-xl">
-                <button onclick="closeCreate()" class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-all text-sm">Hủy</button>
-                <button onclick="submitPrescription()" class="px-5 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 font-medium shadow-sm transition-colors text-sm flex items-center gap-2">
-                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                    Kê đơn thuốc
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
 
 {{-- Header --}}
 <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between">
     <div>
-        <h2 class="text-2xl font-bold text-gray-800">Quản lý đơn thuốc</h2>
-        <p class="text-gray-500 text-sm mt-1">Đơn thuốc do BS. {{ auth()->user()->full_name }} kê cho bệnh nhân</p>
+        <h2 class="text-2xl font-bold text-gray-800">Lịch sử đơn thuốc đã kê</h2>
+        <p class="text-gray-500 text-sm mt-1">Danh sách các đơn thuốc do BS. {{ auth()->user()->full_name }} đã kê dựa trên kết quả khám bệnh</p>
     </div>
-    <button onclick="openCreate()" class="mt-4 md:mt-0 bg-teal-600 hover:bg-teal-700 text-white font-medium py-2 px-4 rounded-lg shadow transition-colors flex items-center gap-2 text-sm">
-        <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
-        Kê đơn thuốc mới
-    </button>
+    <div class="mt-4 md:mt-0 flex items-center gap-3">
+        <div class="relative group">
+            <input type="text" id="prescSearch" placeholder="Tìm tên bệnh nhân..." onkeyup="debounceSearch()"
+                   class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 shadow-sm focus:ring-2 focus:ring-teal-500/10 focus:border-teal-500 transition-all outline-none w-64">
+            <svg class="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 group-focus-within:text-teal-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+        </div>
+    </div>
 </div>
 
 <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -102,8 +46,6 @@
 
 <script>
 const token    = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-const medicines = @json($medicines);
-
 // ===== DETAIL MODAL =====
 function openDetail(id) {
     document.getElementById('detailModal').classList.remove('hidden');
@@ -154,111 +96,16 @@ function closeDetail() {
     setTimeout(() => document.getElementById('detailModal').classList.add('hidden'), 300);
 }
 
-// ===== CREATE MODAL =====
-function openCreate() {
-    document.getElementById('medicalRecordId').value = '';
-    document.getElementById('prescContent').value = '';
-    document.getElementById('medicineRows').innerHTML = '';
-    document.getElementById('createMessage').innerText = '';
-    addMedicineRow();
-    document.getElementById('createModal').classList.remove('hidden');
-    setTimeout(() => {
-        document.getElementById('createBackdrop').classList.remove('opacity-0');
-        const p = document.getElementById('createPanel');
-        p.classList.remove('opacity-0', 'translate-y-4');
-        p.classList.add('opacity-100', 'translate-y-0');
-    }, 10);
-}
-
-function closeCreate() {
-    document.getElementById('createBackdrop').classList.add('opacity-0');
-    const p = document.getElementById('createPanel');
-    p.classList.remove('opacity-100', 'translate-y-0');
-    p.classList.add('opacity-0', 'translate-y-4');
-    setTimeout(() => document.getElementById('createModal').classList.add('hidden'), 300);
-}
-
-let rowIndex = 0;
-function addMedicineRow() {
-    const idx = rowIndex++;
-    const opts = medicines.map(m =>
-        `<option value="${m.id}" data-unit="${m.unit}">${m.name} (Tồn: ${m.stock} ${m.unit})</option>`
-    ).join('');
-    const row = `
-    <div class="grid grid-cols-12 gap-2 items-center" id="mrow-${idx}">
-        <div class="col-span-4">
-            <select name="medicine_${idx}" class="med-select w-full px-2 py-1.5 border border-gray-300 rounded text-sm bg-white focus:border-blue-500">
-                <option value="" disabled selected>-- Chọn thuốc --</option>${opts}
-            </select>
-        </div>
-        <div class="col-span-2">
-            <input type="number" min="1" placeholder="SL" class="qty-input w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500">
-        </div>
-        <div class="col-span-3">
-            <input type="text" placeholder="Liều dùng" class="dos-input w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500">
-        </div>
-        <div class="col-span-2">
-            <input type="text" placeholder="Cách dùng" class="usg-input w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:border-blue-500">
-        </div>
-        <div class="col-span-1 flex justify-center">
-            <button onclick="document.getElementById('mrow-${idx}').remove()" class="text-red-500 hover:text-red-700">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-    </div>`;
-    document.getElementById('medicineRows').insertAdjacentHTML('beforeend', row);
-}
-
-function submitPrescription() {
-    const medicalRecordId = document.getElementById('medicalRecordId').value;
-    const content = document.getElementById('prescContent').value;
-    const msgEl = document.getElementById('createMessage');
-
-    if (!medicalRecordId) { msgEl.className = 'text-red-500 text-sm font-medium text-center'; msgEl.innerText = 'Vui lòng chọn hồ sơ khám'; return; }
-
-    const rows = document.querySelectorAll('#medicineRows > div');
-    const items = [];
-    let valid = true;
-    rows.forEach(row => {
-        const medId = row.querySelector('.med-select').value;
-        const qty   = parseInt(row.querySelector('.qty-input').value);
-        const dos   = row.querySelector('.dos-input').value;
-        const usg   = row.querySelector('.usg-input').value;
-        if (!medId || !qty) { valid = false; return; }
-        items.push({ medicine_id: medId, quantity: qty, dosage: dos, usage: usg });
-    });
-
-    if (!valid || items.length === 0) { msgEl.className = 'text-red-500 text-sm font-medium text-center'; msgEl.innerText = 'Vui lòng điền đủ thông tin thuốc'; return; }
-
-    fetch('/prescriptions', {
-        method: 'POST',
-        headers: { 'X-CSRF-TOKEN': token, 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-            medical_record_id: medicalRecordId,
-            dispensed_by: {{ auth()->id() }},
-            dispense_status: 'pending',
-            content,
-            items
-        })
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.status === 'success') {
-            msgEl.className = 'text-green-600 text-sm font-medium text-center';
-            msgEl.innerText = 'Kê đơn thành công!';
-            loadData();
-            setTimeout(closeCreate, 800);
-        } else {
-            msgEl.className = 'text-red-500 text-sm font-medium text-center';
-            msgEl.innerText = data.message || 'Có lỗi xảy ra';
-        }
-    })
-    .catch(e => alert('Lỗi: ' + e));
-}
-
 // ===== TABLE =====
+let searchTimeout = null;
+function debounceSearch() {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(loadData, 500);
+}
+
 function loadData() {
-    fetch('{{ route("doctor.prescriptions.load") }}')
+    const search = document.getElementById('prescSearch').value;
+    fetch(`{{ route("doctor.prescriptions.load") }}?search=${search}`)
     .then(r => r.json())
     .then(data => {
         const statusMap = {
