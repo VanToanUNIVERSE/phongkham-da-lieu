@@ -24,7 +24,12 @@ class InvoiceController extends Controller
             ->whereYear('created_at', \Carbon\Carbon::now()->year)
             ->sum('total_amount');
 
-        return view('admin.invoice_mg', compact('medical_records', 'revenueThisMonth', 'revenueThisYear'));
+        // 3. Lấy Doanh thu Hôm nay
+        $revenueToday = Invoice::where('status', 'paid')
+            ->whereDate('created_at', \Carbon\Carbon::today())
+            ->sum('total_amount');
+
+        return view('admin.invoice_mg', compact('medical_records', 'revenueThisMonth', 'revenueThisYear', 'revenueToday'));
     }
 
     public function loadData(Request $request)

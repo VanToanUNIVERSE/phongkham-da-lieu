@@ -62,15 +62,19 @@
             </div>
             
             <div class="flex items-center gap-6">
-                <div class="flex items-center gap-3 pr-6 border-r border-slate-200">
+                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 pr-6 border-r border-slate-200 hover:opacity-80 transition-opacity">
                     <div class="text-right hidden sm:block">
                         <p class="text-xs font-bold text-slate-900 leading-tight">{{ Auth::user()->full_name ?? 'Administrator' }}</p>
                         <p class="text-[10px] font-medium text-blue-600 uppercase tracking-tighter">{{ Auth::user()->role->name }}</p>
                     </div>
-                    <div class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center text-blue-600 font-bold">
-                        {{ substr(Auth::user()->full_name ?? 'A', 0, 1) }}
+                    <div class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center text-blue-600 font-bold overflow-hidden">
+                        @if(Auth::user()->avatar)
+                            <img src="{{ asset('storage/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                        @else
+                            {{ substr(Auth::user()->full_name ?? 'A', 0, 1) }}
+                        @endif
                     </div>
-                </div>
+                </a>
 
                 <a href="{{ route('profile.change-password') }}" class="group flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors font-bold text-xs uppercase tracking-widest mr-4 pr-4 border-r border-slate-200">
                     <svg class="h-4 w-4 transition-transform group-hover:scale-110" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>

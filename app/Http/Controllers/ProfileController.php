@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Password;
 
 class ProfileController extends Controller
@@ -15,6 +16,43 @@ class ProfileController extends Controller
     public function showChangePassword()
     {
         return view('profile.change_password');
+    }
+
+    /**
+     * Hiển thị trang hồ sơ cá nhân.
+     */
+    public function showProfile()
+    {
+        return view('profile.edit', ['user' => Auth::user()]);
+    }
+
+    /**
+     * Cập nhật hồ sơ cá nhân.
+     */
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
+            'full_name' => 'required|string|max:255',
+            'phone'     => 'nullable|string|max:20',
+            'avatar'    => 'nullable|image|max:2048',
+        ], [
+            'full_name.required' => 'Vui lòng nhập họ tên.',
+        ]);
+
+        $user = Auth::user();
+        $data = $request->only(['full_name', 'phone']);
+
+        if ($request->hasFile('avatar')) {
+            // Xóa avatar cũ nếu có
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+        }
+
+        $user->update($data);
+
+        return back()->with('success', 'Cập nhật hồ sơ thành công!');
     }
 
     /**

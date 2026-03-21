@@ -22,7 +22,7 @@
     </div>
 
     {{-- Stats Grid for Admin --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         {{-- Revenue Month --}}
         <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition-all duration-500">
             <div class="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
@@ -54,6 +54,24 @@
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Doanh thu năm nay</p>
                     <h3 class="text-3xl font-black text-slate-900 leading-tight">
                         {{ number_format($revenueThisYear ?? 0, 0, ',', '.') }}<span class="text-xs ml-1 text-slate-400 uppercase tracking-tighter">VNĐ</span>
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+        {{-- Revenue Today --}}
+        <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-100 relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+            <div class="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500">
+                <svg class="w-24 h-24 text-violet-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/></svg>
+            </div>
+            <div class="relative z-10 flex items-center gap-6">
+                <div class="w-16 h-16 bg-violet-50 text-violet-600 rounded-2xl flex items-center justify-center shadow-inner border border-violet-100/50">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Doanh thu hôm nay</p>
+                    <h3 class="text-3xl font-black text-slate-900 leading-tight">
+                        {{ number_format($revenueToday ?? 0, 0, ',', '.') }}<span class="text-xs ml-1 text-slate-400 uppercase tracking-tighter">VNĐ</span>
                     </h3>
                 </div>
             </div>

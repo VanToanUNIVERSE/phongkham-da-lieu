@@ -116,4 +116,6 @@ Route::prefix('patient')->middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/change-password', [\App\Http\Controllers\ProfileController::class, 'showChangePassword'])->name('profile.change-password');
     Route::post('/change-password', [\App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('profile.update-password');
+    Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'showProfile'])->name('profile.edit');
+    Route::post('/profile', [\App\Http\Controllers\ProfileController::class, 'updateProfile'])->name('profile.update');
 });
